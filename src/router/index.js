@@ -9,6 +9,12 @@ const routes = [
     name: 'Welcome',
     component: () => import(/* webpackChunkName: "Welcome" */ '../views/Welcome.vue'),
   },
+  {
+    path: '/collections/:dbId',
+    name: 'Collections',
+    props: true,
+    component: () => import(/* webpackChunkName: "Collections" */ '../views/Collections.vue'),
+  },
 ];
 
 const router = new VueRouter({

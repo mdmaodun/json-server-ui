@@ -1,12 +1,44 @@
 <template>
   <v-app>
+    <v-navigation-drawer app>
+      <v-list-item>
+        <v-list-item-content>
+          <v-list-item-title class="title">
+            数据库列表
+          </v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+
+      <v-list dense nav>
+        <v-skeleton-loader v-show="!isShowDBList" type="article"></v-skeleton-loader>
+        <v-hover v-for="(db, i) in dbs" :key="db.id">
+          <template #default="{ hover }">
+            <v-list-item link @click="onDBClick(db)">
+              <v-list-item-content>
+                <v-list-item-title>{{ db.name }}</v-list-item-title>
+              </v-list-item-content>
+              <v-list-item-icon v-show="hover" @click.stop="del(db, i)">
+                <v-icon>mdi-delete</v-icon>
+              </v-list-item-icon>
+            </v-list-item>
+          </template>
+        </v-hover>
+      </v-list>
+
+      <v-list-item>
+        <v-list-item-content>
+          <v-btn @click="showCreateDBDialog" elevation="0"> <v-icon>mdi-plus</v-icon>创建数据库</v-btn>
+        </v-list-item-content>
+      </v-list-item>
+    </v-navigation-drawer>
+
     <v-app-bar app>
       <div class="d-flex align-center">
         <v-img
           alt="JSONDBAPI Logo"
           class="shrink mr-2"
           contain
-          src="../src/assets/logo2.png"
+          src="../src/assets/logo.svg"
           transition="scale-transition"
           width="40"
         />
@@ -23,54 +55,26 @@
 
     <v-main>
       <v-container fluid>
-        <v-row>
-          <v-col cols="auto">
-            <v-navigation-drawer>
-              <v-list-item>
-                <v-list-item-content class="py-0">
-                  <v-list-item-title class="title">
-                    DB List
-                  </v-list-item-title>
-                  <v-list-item-subtitle>
-                    {{ dbs.length > 0 ? 'Your database list' : "You don't have a database yet" }}
-                  </v-list-item-subtitle>
-                </v-list-item-content>
-                <v-btn color="primary" fab dark small absolute center right @click="showCreateDBDialog">
-                  <v-icon>mdi-plus</v-icon>
-                </v-btn>
-              </v-list-item>
-
-              <v-list dense nav>
-                <v-list-item v-for="db in dbs" :key="db.id" link>
-                  <v-list-item-content>
-                    <v-list-item-title>{{ db.name }}</v-list-item-title>
-                  </v-list-item-content>
-                </v-list-item>
-              </v-list>
-            </v-navigation-drawer>
-          </v-col>
-          <v-col>
-            <router-view></router-view>
-          </v-col>
-        </v-row>
+        <router-view></router-view>
       </v-container>
     </v-main>
+
     <v-footer padless>
       <v-col class="text-center" cols="12"> {{ new Date().getFullYear() }} — <strong>JSONDBAPI</strong> </v-col>
     </v-footer>
     <v-dialog v-model="createDBDialog.visible" max-width="500px">
       <v-card>
         <v-card-title>
-          Create DB
+          创建数据库
         </v-card-title>
 
         <v-card-text>
           <v-text-field
-            ref="nameFieldRef"
-            label="Name"
+            ref="dbNameFieldRef"
+            label="名称"
+            clearable
             v-model="createDBDialog.form.data.name"
-            :rules="[rules.required, (v) => !dbs.some((db) => db.name === v) || 'The name already exist.']"
-            @keyup.enter="onSubmitOfCreateDBDialog"
+            :rules="[rules.required, (v) => !dbs.some((db) => db.name === v) || '英雄，这个数据库已经存在了哦~']"
           ></v-text-field>
         </v-card-text>
 
@@ -78,7 +82,7 @@
           <v-spacer></v-spacer>
 
           <v-btn text color="primary" @click="onSubmitOfCreateDBDialog">
-            Submit
+            提交
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -91,8 +95,9 @@ export default {
   name: 'App',
   data() {
     return {
+      isShowDBList: false,
       rules: {
-        required: (v) => !!v || 'Required.',
+        required: (v) => !!v || '英雄，这个必须要填哦~',
       },
       dbs: [],
       createDBDialog: {
@@ -112,14 +117,33 @@ export default {
       url: '/dbs',
     }).then((res) => {
       this.dbs = res.data;
+      this.$nextTick(() => {
+        this.isShowDBList = true;
+      });
     });
   },
   methods: {
+    onDBClick(db) {
+      if (this.$route.params.dbId != db.id) {
+        this.$router.push(`/collections/${db.id}`);
+      }
+    },
+    del(db, i) {
+      this.$request({
+        method: 'DELETE',
+        url: `/dbs/${db.id}`,
+      }).then(() => {
+        this.dbs.splice(i, 1);
+        if (db.id == this.$route.params.dbId) {
+          this.$router.push('/');
+        }
+      });
+    },
     showCreateDBDialog() {
       this.createDBDialog.visible = true;
     },
     onSubmitOfCreateDBDialog() {
-      if (this.$refs.nameFieldRef.validate(true)) {
+      if (this.$refs.dbNameFieldRef.validate(true)) {
         this.$request({
           method: 'POST',
           url: '/dbs',
@@ -128,7 +152,7 @@ export default {
           this.dbs.push(res.data);
           this.createDBDialog.form.data.name = '';
           this.createDBDialog.visible = false;
-          this.$refs.nameFieldRef.reset();
+          this.$refs.dbNameFieldRef.reset();
         });
       }
     },
