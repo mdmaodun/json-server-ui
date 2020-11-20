@@ -1,0 +1,14 @@
+@baseurl=http://localhost:8001
+
+###
+#
+GET {{baseurl}}/dbs
+
+###
+#
+POST {{baseurl}}/dbs
+Content-Type: application/json
+
+{
+  "name": "todos"
+}

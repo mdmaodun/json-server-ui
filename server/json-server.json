@@ -1,0 +1,5 @@
+{
+  "port": 8001,
+  "middlewares": ["middlewares/common.js", "middlewares/batch.js"],
+  "watch": false
+}

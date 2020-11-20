@@ -1,0 +1,17 @@
+@baseurl=http://localhost:8001
+
+###
+# 获取所有数据
+GET {{baseurl}}/db
+
+###
+# 初始化数据库
+GET {{baseurl}}/initdb
+
+###
+# 备份
+GET {{baseurl}}/backup
+
+###
+# 还原
+GET {{baseurl}}/restore?v=1.0.0
