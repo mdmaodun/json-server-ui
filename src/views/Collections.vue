@@ -22,10 +22,11 @@
               :disabled="db.status === 'running'"
               label="端口:"
               class="mt-5"
+              clearable
               v-model="db.port"
               :rules="[
                 (v) => {
-                  if (v === '') return true;
+                  if (!v) return true;
                   if (!/^\d+$/.test(v)) {
                     return '只能是数字';
                   }
@@ -236,11 +237,11 @@ export default {
     },
     runServer() {
       if (this.collections.length === 0) {
-        this.showSnackbar({ text: '英雄，你还没有创建集合哦~' });
+        this.showSnackbar({ text: '英雄, 你还没有创建集合哦~' });
         return;
       }
       if (!this.db.port) {
-        this.showSnackbar({ text: '英雄，请先设置一个端口号吧！要未占用的哟~😁' });
+        this.showSnackbar({ text: '英雄, 先设置一个端口号哈~ 😁' });
         return;
       }
       if (!this.$refs.portTextFieldRef.validate(true)) {
@@ -261,7 +262,7 @@ export default {
           this.showSnackbar({ text: '已启动' });
         })
         .catch((err) => {
-          this.showSnackbar({ text: '英雄！这个端口被占用了哦！😮换个试试~' });
+          this.showSnackbar({ text: '英雄! 这个端口被占用了哦! 😮 换个试试~' });
         })
         .finally(() => {
           this.isLoadingOfServer = false;

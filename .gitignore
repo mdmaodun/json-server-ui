@@ -24,4 +24,4 @@ pnpm-debug.log*
 
 test*.js
 
-server/dbs
+dbs

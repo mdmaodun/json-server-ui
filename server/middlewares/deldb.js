@@ -4,7 +4,7 @@ const getdb = require('../utils/getdb.js');
 const db = getdb(path.join(__dirname, '../db.json'));
 const UrlPattern = require('url-pattern');
 const idParamsPattern = new UrlPattern('/dbs(/:id)');
-const dbsRootDirPath = path.join(__dirname, '../dbs');
+const { dbsRootDirPath } = require('../utils/consts');
 
 module.exports = (req, res, next) => {
   const { method, path: path2 } = req;

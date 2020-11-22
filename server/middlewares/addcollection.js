@@ -1,6 +1,7 @@
 const { join } = require('path');
 const getdb = require('../utils/getdb.js');
 const db = getdb(join(__dirname, '../db.json'));
+const { dbsRootDirPath } = require('../utils/consts');
 
 module.exports = (req, res, next) => {
   const { method, path, body } = req;
@@ -11,7 +12,7 @@ module.exports = (req, res, next) => {
       .get('dbs')
       .find({ id: dbId })
       .value();
-    const db2 = getdb(join(__dirname, '../dbs', dbName, 'db.json'));
+    const db2 = getdb(join(dbsRootDirPath, dbName, 'db.json'));
     db2.read();
     db2.set(name, []).write();
   }

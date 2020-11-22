@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const dbsRootDirPath = path.join(__dirname, '../dbs');
+const { dbsRootDirPath } = require('../utils/consts');
 if (!fs.existsSync(dbsRootDirPath)) {
   fs.mkdirSync(dbsRootDirPath);
 }

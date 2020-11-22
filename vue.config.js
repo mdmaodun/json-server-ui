@@ -1,12 +1,12 @@
 module.exports = {
   devServer: {
-    port: 8000,
+    port: 6660,
     before() {
       require('./server/index.js')();
     },
     proxy: {
       '/api': {
-        target: 'http://localhost:8001',
+        target: 'http://localhost:6661',
         pathRewrite: {
           '^/api': '',
         },

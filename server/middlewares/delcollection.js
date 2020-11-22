@@ -1,10 +1,9 @@
-const fs = require('fs');
 const { join } = require('path');
 const getdb = require('../utils/getdb.js');
 const db = getdb(join(__dirname, '../db.json'));
 const UrlPattern = require('url-pattern');
 const idParamsPattern = new UrlPattern('/collections(/:id)');
-const dbsRootDirPath = join(__dirname, '../dbs');
+const { dbsRootDirPath } = require('../utils/consts');
 
 module.exports = (req, res, next) => {
   const { method, path } = req;

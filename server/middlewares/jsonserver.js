@@ -3,6 +3,7 @@ const { join } = require('path');
 const db = getdb(join(__dirname, '../db.json'));
 const runjsonserver = require('../utils/runjsonserver');
 const { kill } = require('process');
+const { dbsRootDirPath } = require('../utils/consts');
 
 module.exports = (req, res, next) => {
   const { method, path } = req;
@@ -21,7 +22,7 @@ module.exports = (req, res, next) => {
       return;
     }
 
-    const dbJsonFilePath = join(__dirname, '../dbs', name, 'db.json');
+    const dbJsonFilePath = join(dbsRootDirPath, name, 'db.json');
 
     runjsonserver({ dbJsonFilePath, port })
       .then(({ pid: processId }) => {
