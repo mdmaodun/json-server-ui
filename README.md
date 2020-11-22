@@ -26,15 +26,19 @@ http://localhost:6660
 ```
 
 ## 特性
-- 多数据库、集合管理
+- 在界面上点一点，即可拥有强大的 API 服务
 
-- API 服务启动、停止
+- 多库、多集合管理
+
+- 独立进程启动、停止 API 服务
+
+- 多操作系统支持（MacOS、Windows、Linux）
 
 - 端口检查
 
-- 支持中间件拦截
+- 中间件拦截，详细步骤如下：
 
-  第一步，在 `/dbs/{dbName}/middlewares/` 文件夹下添加一个 `js` 文件，例如：`sayHi.js`
+  第一步，在 `/dbs/{dbName}/middlewares/` 文件夹下添加一个 `*.js` 文件，例如：`sayHi.js`
 
   ```javascript
   module.exports = (req, res, next) => {
@@ -54,8 +58,8 @@ http://localhost:6660
   }
   ```
   
-  第二步，启动（**如果事先已经启动，请停止后再启动**），即可生效
+  第二步，启动（**如果事先已经启动，请停止后再启动**），即可自动识别生效
   
-  第三步，访问路径 `/sayHi?name=王二麻子` 即可
+  第三步，访问路径：`/sayHi?name=王二麻子` 
   
   
