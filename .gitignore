@@ -25,5 +25,3 @@ pnpm-debug.log*
 test*.js
 
 server/dbs
-
-server/db.json
