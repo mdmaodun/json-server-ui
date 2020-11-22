@@ -1,4 +1,4 @@
-# JSONDBAPI
+# json-server-ui
 > 这是一个次奥🐓简单的 [json-server](https://github.com/typicode/json-server) 图形化管理界面，欢迎试用！Star 思密达~ 🙂
 
 ## 下载
@@ -6,13 +6,13 @@
 进入一个合适的目录，执行：
 
 ```
-git clone https://github.com/mdmaodun/jsondbapi.git
+git clone https://github.com/mdmaodun/json-server-ui.git
 ```
 
 ## 安装依赖
 
 ```
-cd jsondbapi && npm i
+cd json-server-ui && npm i
 ```
 
 ## 运行

@@ -1,6 +1,6 @@
 {
-  "name": "jsondbapi",
-  "version": "1.1.2",
+  "name": "json-server-ui",
+  "version": "1.1.3",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",

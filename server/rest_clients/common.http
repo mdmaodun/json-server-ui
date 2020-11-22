@@ -17,7 +17,7 @@ GET {{baseurl}}/backup
 GET {{baseurl}}/restore?v=1.0.0
 
 ###
-# 启动JSONDBAPI服务
+# 启动 API 服务
 POST {{baseurl}}/runServer
 Content-Type: application/json
 
@@ -27,7 +27,7 @@ Content-Type: application/json
 }
 
 ###
-# 停止JSONDBAPI服务
+# 停止 API 服务
 POST {{baseurl}}/stopServer
 Content-Type: application/json
 

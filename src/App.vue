@@ -35,19 +35,19 @@
     <v-app-bar app>
       <div class="d-flex align-center">
         <v-img
-          alt="JSONDBAPI Logo"
+          alt="json-server-ui logo"
           class="shrink mr-2"
           contain
           src="../src/assets/logo.svg"
           transition="scale-transition"
           width="40"
         />
-        <v-toolbar-title>JSONDBAPI</v-toolbar-title>
+        <v-toolbar-title>JSON-SERVER-UI</v-toolbar-title>
       </div>
 
       <v-spacer></v-spacer>
 
-      <v-btn href="https://github.com/mdmaodun/jsondbapi" target="_blank" text>
+      <v-btn href="https://github.com/mdmaodun/json-server-ui" target="_blank" text>
         <v-icon>mdi-github</v-icon>
       </v-btn>
 
@@ -64,7 +64,7 @@
     </v-main>
 
     <v-footer padless>
-      <v-col class="text-center" cols="12"> {{ new Date().getFullYear() }} — <strong>JSONDBAPI</strong> </v-col>
+      <v-col class="text-center" cols="12"> © {{ new Date().getFullYear() }} — <strong>json-server-ui</strong> </v-col>
     </v-footer>
     <v-dialog v-model="createDBDialog.visible" max-width="500px">
       <v-card>
