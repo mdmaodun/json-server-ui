@@ -1,34 +1,6 @@
 {
-  "dbs": [
-    {
-      "name": "todos",
-      "ctime": 1605888255098,
-      "utime": 1605888255098,
-      "id": 1
-    },
-    {
-      "name": "test",
-      "ctime": 1605890936922,
-      "utime": 1605890936922,
-      "id": 2
-    }
-  ],
-  "collections": [
-    {
-      "name": "users",
-      "dbId": "1",
-      "ctime": 1605890910562,
-      "utime": 1605890910562,
-      "id": 2
-    },
-    {
-      "name": "tasks",
-      "dbId": "1",
-      "ctime": 1605893823905,
-      "utime": 1605893823905,
-      "id": 3
-    }
-  ],
+  "dbs": [],
+  "collections": [],
   "db": {
     "version": "1.0.0"
   }
