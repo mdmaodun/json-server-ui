@@ -1,6 +1,6 @@
 const { spawn } = require('child_process');
 const isInUseOfPort = require('../utils/isInUseOfPort');
-const { readdirSync } = require('fs');
+const { existsSync, readdirSync } = require('fs');
 const { dirname, join } = require('path');
 
 module.exports = ({ dbJsonFilePath, port }) => {
@@ -10,11 +10,16 @@ module.exports = ({ dbJsonFilePath, port }) => {
     }
 
     const middlewaresDirPath = join(dirname(dbJsonFilePath), 'middlewares');
-    const filePaths = readdirSync(middlewaresDirPath).map((v) => join(middlewaresDirPath, v));
+
+    const middlewaresConfigs = [];
+    if (existsSync(middlewaresDirPath)) {
+      const filePaths = readdirSync(middlewaresDirPath).map((v) => join(middlewaresDirPath, v));
+      middlewaresConfigs.push('--middlewares', ...filePaths);
+    }
 
     const childProcess = spawn(
       'npx',
-      ['json-server', '--port', port, '--middlewares', ...filePaths, '--watch', dbJsonFilePath],
+      ['json-server', '--port', port, ...middlewaresConfigs, '--watch', dbJsonFilePath],
       {
         detached: true,
         stdio: 'ignore',
