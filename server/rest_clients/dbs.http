@@ -10,5 +10,9 @@ POST {{baseurl}}/dbs
 Content-Type: application/json
 
 {
-  "name": "todos"
+  "name": "a"
 }
+
+###
+#
+DELETE {{baseurl}}/dbs/2

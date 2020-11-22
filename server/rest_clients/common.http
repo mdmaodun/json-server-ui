@@ -15,3 +15,26 @@ GET {{baseurl}}/backup
 ###
 # 还原
 GET {{baseurl}}/restore?v=1.0.0
+
+###
+# 启动JSONDBAPI服务
+POST {{baseurl}}/runServer
+Content-Type: application/json
+
+{
+  "dbId": 1,
+  "port": "3001"
+}
+
+###
+# 停止JSONDBAPI服务
+POST {{baseurl}}/stopServer
+Content-Type: application/json
+
+{
+  "dbId": 1
+}
+
+###
+# 检查端口是否被占用
+GET {{baseurl}}/checkPortIsInUse?port=8001

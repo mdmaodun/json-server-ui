@@ -1,0 +1,23 @@
+@baseurl=http://localhost:8001
+
+###
+#
+GET {{baseurl}}/collections
+
+###
+#
+GET {{baseurl}}/collections?dbId=2
+
+###
+#
+POST {{baseurl}}/collections
+Content-Type: application/json
+
+{
+  "name": "users",
+  "dbId": 1
+}
+
+###
+#
+DELETE {{baseurl}}/collections/2

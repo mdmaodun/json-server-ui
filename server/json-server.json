@@ -1,5 +1,12 @@
 {
   "port": 8001,
-  "middlewares": ["middlewares/common.js", "middlewares/batch.js"],
+  "middlewares": [
+    "middlewares/common.js", 
+    "middlewares/adddb.js",
+    "middlewares/deldb.js",
+    "middlewares/addcollection.js",
+    "middlewares/delcollection.js",
+    "middlewares/jsonserver.js"
+  ],
   "watch": true
 }

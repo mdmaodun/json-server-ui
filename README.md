@@ -1,19 +1,6 @@
-# jsondbapi
+# JSONDBAPI
 
-## Project setup
+## 下载
 ```
-npm install
+git clone https://github.com/mdmaodun/jsondbapi.git
 ```
-
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
-
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).

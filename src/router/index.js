@@ -12,7 +12,7 @@ const routes = [
   {
     path: '/collections/:dbId',
     name: 'Collections',
-    props: true,
+    props: (route) => ({ dbId: parseInt(route.params.dbId) }),
     component: () => import(/* webpackChunkName: "Collections" */ '../views/Collections.vue'),
   },
 ];

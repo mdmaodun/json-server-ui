@@ -2,7 +2,9 @@ const fs = require('fs');
 const { existsSync, mkdirSync } = fs;
 const { readFile, writeFile, copyFile } = fs.promises;
 const { join } = require('path');
-const db = require('../utils/getdb.js')();
+const getdb = require('../utils/getdb.js');
+const db = getdb(join(__dirname, '../db.json'));
+const isInUseOfPort = require('../utils/isInUseOfPort');
 
 module.exports = (req, res, next) => {
   const { method, path, body, query } = req;
@@ -17,7 +19,10 @@ module.exports = (req, res, next) => {
 
   // 备份
   if (method === 'GET' && path === '/backup') {
-    const version = db.read().get('db.version').value();
+    const version = db
+      .read()
+      .get('db.version')
+      .value();
     if (version) {
       const dirPath = join(__dirname, '../backups');
       if (!existsSync(dirPath)) {
@@ -60,6 +65,22 @@ module.exports = (req, res, next) => {
     if (method === 'PATCH') {
       delete body.ctime;
     }
+  }
+
+  // 检查端口是否被占用
+  if (method === 'GET' && path === '/checkPortIsInUse') {
+    const { query } = req;
+    const { port } = query;
+
+    isInUseOfPort(port).then((isInUse) => {
+      res.json({
+        data: {
+          isInUse,
+        },
+      });
+    });
+
+    return;
   }
 
   next();
