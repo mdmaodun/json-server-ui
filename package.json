@@ -1,6 +1,6 @@
 {
   "name": "jsondbapi",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -11,6 +11,7 @@
     "axios": "^0.21.0",
     "core-js": "^3.6.5",
     "json-server": "^0.16.3",
+    "kill-port": "^1.6.1",
     "lowdb": "^1.0.0",
     "url-pattern": "^1.0.3",
     "vue": "^2.6.11",
