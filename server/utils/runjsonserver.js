@@ -18,18 +18,23 @@ module.exports = ({ dbJsonFilePath, port }) => {
         middlewaresConfigs.push('--middlewares', ...filePaths);
       }
     }
-
-    const childProcess = spawn(
-      'npx',
-      ['json-server', '--port', port, ...middlewaresConfigs, '--watch', dbJsonFilePath],
-      {
-        detached: true,
-        stdio: 'ignore',
-        // windowsHide: true,
-      }
-    );
-    childProcess.unref();
-    console.log(childProcess.pid, 'childProcess.pid');
-    return childProcess;
+    const isWin = process.platform === 'win32';
+    try {
+      const childProcess = spawn(
+        isWin ? 'npx.cmd' : 'npx',
+        ['json-server', '--port', port, ...middlewaresConfigs, '--watch', dbJsonFilePath],
+        {
+          detached: isWin ? false : true,
+          // ...(isWin ? {} : { detached: true }),
+          stdio: 'ignore',
+          windowsHide: true,
+        }
+      );
+      childProcess.unref();
+      console.log(childProcess.pid, 'childProcess.pid');
+      return childProcess;
+    } catch (err) {
+      throw new Error(`spawn run err.` + err.message);
+    }
   });
 };

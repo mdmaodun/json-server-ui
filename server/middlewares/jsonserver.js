@@ -2,8 +2,8 @@ const getdb = require('../utils/getdb');
 const { join } = require('path');
 const db = getdb(join(__dirname, '../db.json'));
 const runjsonserver = require('../utils/runjsonserver');
-const { kill } = require('process');
 const { dbsRootDirPath } = require('../utils/consts');
+const killPort = require('kill-port');
 
 module.exports = (req, res, next) => {
   const { method, path } = req;
@@ -43,7 +43,7 @@ module.exports = (req, res, next) => {
     db.read();
 
     const dbOfLowdb = db.get('dbs').find({ id: dbId });
-    const { status, processId } = dbOfLowdb.value();
+    const { status, port } = dbOfLowdb.value();
 
     if (status === 'stopped') {
       res.send('The API service for this database has already been stopped.');
@@ -52,11 +52,9 @@ module.exports = (req, res, next) => {
 
     dbOfLowdb.assign({ status: 'stopped', processId: '', utime }).write();
 
-    try {
-      kill(processId);
-    } catch (err) {
-      console.log('kill err.', err.message);
-    }
+    killPort(port).catch((err) => {
+      console.log('kill err1.', err.message);
+    });
     res.send('ok.');
     return;
   }
