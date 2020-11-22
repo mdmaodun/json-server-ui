@@ -27,7 +27,7 @@ module.exports = (req, res, next) => {
     runjsonserver({ dbJsonFilePath, port })
       .then(({ pid: processId }) => {
         dbOfLowdb.assign({ status: 'running', port, processId, utime }).write();
-        res.send('ok');
+        res.send('ok.');
       })
       .catch((err) => {
         res.status(400).send(err.message);
@@ -55,7 +55,7 @@ module.exports = (req, res, next) => {
     try {
       kill(processId);
     } catch (err) {
-      console.log(err);
+      console.log('kill err.', err.message);
     }
     res.send('ok.');
     return;

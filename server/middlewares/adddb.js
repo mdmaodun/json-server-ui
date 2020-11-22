@@ -12,7 +12,7 @@ module.exports = (req, res, next) => {
     body.port = '';
     body.processId = '';
     const { name } = body;
-    fs.mkdirSync(path.join(dbsRootDirPath, name));
+    fs.mkdirSync(path.join(dbsRootDirPath, name, 'middlewares'), { recursive: true });
     fs.writeFileSync(
       path.join(dbsRootDirPath, `${name}/db.json`),
       JSON.stringify(

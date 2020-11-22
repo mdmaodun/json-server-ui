@@ -14,7 +14,9 @@ module.exports = ({ dbJsonFilePath, port }) => {
     const middlewaresConfigs = [];
     if (existsSync(middlewaresDirPath)) {
       const filePaths = readdirSync(middlewaresDirPath).map((v) => join(middlewaresDirPath, v));
-      middlewaresConfigs.push('--middlewares', ...filePaths);
+      if (filePaths.length) {
+        middlewaresConfigs.push('--middlewares', ...filePaths);
+      }
     }
 
     const childProcess = spawn(
@@ -23,7 +25,7 @@ module.exports = ({ dbJsonFilePath, port }) => {
       {
         detached: true,
         stdio: 'ignore',
-        windowsHide: true,
+        // windowsHide: true,
       }
     );
     childProcess.unref();
