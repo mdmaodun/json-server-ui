@@ -1,7 +1,8 @@
 {
   "port": 5001,
+  "host": ["localhost"],
   "middlewares": [
-    "middlewares/common.js", 
+    "middlewares/common.js",
     "middlewares/adddb.js",
     "middlewares/deldb.js",
     "middlewares/addcollection.js",
