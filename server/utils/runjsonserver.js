@@ -9,7 +9,9 @@ module.exports = ({ dbJsonFilePath, port }) => {
       throw new Error(`This port:${port} is already occupied`);
     }
 
-    const middlewaresDirPath = join(dirname(dbJsonFilePath), 'middlewares');
+    const dbRootDirPath = dirname(dbJsonFilePath);
+    const middlewaresDirPath = join(dbRootDirPath, 'middlewares');
+    const routesMapFilePath = join(dbRootDirPath, 'routes-map.json');
 
     const middlewaresConfigs = [];
     if (existsSync(middlewaresDirPath)) {
@@ -22,7 +24,16 @@ module.exports = ({ dbJsonFilePath, port }) => {
     try {
       const childProcess = spawn(
         isWin ? 'npx.cmd' : 'npx',
-        ['json-server', '--port', port, ...middlewaresConfigs, '--watch', dbJsonFilePath],
+        [
+          'json-server',
+          '--port',
+          port,
+          ...middlewaresConfigs,
+          '--watch',
+          dbJsonFilePath,
+          '--routes',
+          routesMapFilePath,
+        ],
         {
           detached: isWin ? false : true,
           // ...(isWin ? {} : { detached: true }),

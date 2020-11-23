@@ -18,17 +18,21 @@
           <template #default="{ hover }">
             <v-list-item link @click="onDBClick(db)">
               <v-list-item-content>
-                <v-list-item-title>{{ db.name }}</v-list-item-title>
+                <v-list-item-title>
+                  <v-icon class="mr-2">mdi-database</v-icon>
+                  <span>{{ db.name }}</span>
+                </v-list-item-title>
               </v-list-item-content>
               <v-list-item-icon v-show="hover" @click.stop="del(db, i)">
-                <v-icon>mdi-delete</v-icon>
+                <v-icon color="pink">mdi-delete</v-icon>
               </v-list-item-icon>
             </v-list-item>
           </template>
         </v-hover>
         <v-btn block @click="showCreateDBDialog" height="40" elevation="0" class="mt-6">
-          <v-icon>mdi-plus</v-icon>创建数据库</v-btn
-        >
+          <v-icon class="mr-2">mdi-database-plus</v-icon>
+          <span>创建数据库</span>
+        </v-btn>
       </v-list>
     </v-navigation-drawer>
 
@@ -42,18 +46,28 @@
           transition="scale-transition"
           width="40"
         />
+        <!-- <div class="d-flex flex-column justify-center">
+          <v-toolbar-title>JSON-SERVER-UI</v-toolbar-title>
+          <v-subheader class="d-inline pa-0" style="height: unset;">这是一个次奥🐓简单的 json-server 图形化管理界面！🙂</v-subheader>
+        </div> -->
         <v-toolbar-title>JSON-SERVER-UI</v-toolbar-title>
+        <v-subheader>这是一个次奥🐓简单的 json-server 图形化管理界面！🙂</v-subheader>
       </div>
 
       <v-spacer></v-spacer>
 
-      <v-btn href="https://github.com/mdmaodun/json-server-ui" target="_blank" text>
-        <v-icon>mdi-github</v-icon>
+      <v-btn href="https://github.com/typicode/json-server" target="_blank" text>
+        <span class="mr-2">json-server</span>
+        <v-icon>mdi-open-in-new</v-icon>
       </v-btn>
 
-      <v-btn href="https://github.com/typicode/json-server" target="_blank" text>
-        <span class="mr-2">请求API参考文档</span>
+      <v-btn href="https://github.com/typicode/lowdb" target="_blank" text>
+        <span class="mr-2">lowdb</span>
         <v-icon>mdi-open-in-new</v-icon>
+      </v-btn>
+
+      <v-btn href="https://github.com/mdmaodun/json-server-ui" target="_blank" text>
+        <v-icon>mdi-github</v-icon>
       </v-btn>
     </v-app-bar>
 

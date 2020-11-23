@@ -2,13 +2,15 @@
   <div class="collections">
     <v-card elevation="0" :loading="isLoading">
       <v-card-title>
+        <v-icon color="black" class="mr-2">mdi-database</v-icon>
+
         <h2>{{ db.name }}</h2>
 
         <v-toolbar elevation="0" class="ml-10">
           <v-tooltip bottom>
             <template #activator="{ on, attrs }">
               <v-btn icon v-bind="attrs" v-on="on" @click="showAddCollectionDialog">
-                <v-icon>mdi-plus</v-icon>
+                <v-icon>mdi-table-plus</v-icon>
               </v-btn>
             </template>
             <span>添加集合</span>
@@ -16,13 +18,16 @@
 
           <v-divider vertical inset class="mx-4"></v-divider>
 
-          <v-col cols="1">
+          <v-icon :color="db.status === 'running' ? 'primary' : ''">mdi-server</v-icon>
+          <v-col cols="2">
             <v-text-field
+              label="端口: "
               ref="portTextFieldRef"
               :disabled="db.status === 'running'"
-              label="端口:"
+              :loading="db.status === 'running'"
               class="mt-5"
               clearable
+              :messages="db.status === 'running' ? '正在运行...' : ''"
               v-model="db.port"
               :rules="[
                 (v) => {
@@ -66,7 +71,7 @@
                 v-show="db.status === 'running'"
                 :loading="isLoadingOfServer"
               >
-                <v-icon>mdi-stop</v-icon>
+                <v-icon>mdi-stop-circle-outline</v-icon>
               </v-btn>
             </template>
             <span>停止服务</span>
@@ -77,33 +82,194 @@
         <p class="text--secondary" v-show="!isLoading && collections.length === 0">
           暂无集合
         </p>
-        <v-list dense>
-          <v-list-item-group>
-            <v-row>
-              <v-col v-for="(v, i) in collections" :key="v.id" cols="3">
-                <v-hover>
-                  <template #default="{ hover }">
-                    <v-list-item>
-                      <v-list-item-content>
-                        <v-list-item-title>{{ v.name }}</v-list-item-title>
-                        <v-list-item-subtitle>{{ v.description }}</v-list-item-subtitle>
-                      </v-list-item-content>
-                      <v-list-item-icon v-show="hover" @click.stop="del(v, i)">
-                        <v-icon>mdi-delete</v-icon>
-                      </v-list-item-icon>
-                    </v-list-item>
-                  </template>
-                </v-hover>
-              </v-col>
-              <!-- <v-col cols="3">
-                <v-btn block @click="showAddCollectionDialog" height="40" elevation="0" class="justify-start">
-                  <v-icon>mdi-plus</v-icon>
-                  <span>添加集合</span>
+        <v-row>
+          <v-col v-for="(v, i) in collections" :key="v.id" cols="3" class="float-left">
+            <v-card :loading="curOperateId === v.id && isLoading" elevation="1">
+              <v-toolbar elevation="1">
+                <v-toolbar-title>
+                  <v-icon class="mr-2">mdi-table</v-icon>
+                  <span>{{ v.name }}</span>
+                </v-toolbar-title>
+
+                <v-spacer></v-spacer>
+
+                <v-btn icon @click.stop="del(v, i)" :loading="curOperateId === v.id && isLoading">
+                  <v-icon color="pink">mdi-delete</v-icon>
                 </v-btn>
-              </v-col> -->
-            </v-row>
-          </v-list-item-group>
-        </v-list>
+              </v-toolbar>
+
+              <v-subheader>
+                <span>{{ v.description || '暂无描述' }}</span>
+              </v-subheader>
+            </v-card>
+          </v-col>
+        </v-row>
+
+        <v-card class="mt-4">
+          <v-toolbar elevation="0">
+            <v-toolbar-title>API 指南</v-toolbar-title>
+            <v-subheader
+              >占位符：{resource} - 集合名, {childResource} - 关联子集合名, {parentResource} - 关联父集合名, {dbName} -
+              数据库名</v-subheader
+            >
+          </v-toolbar>
+          <v-expansion-panels accordion>
+            <v-expansion-panel>
+              <v-expansion-panel-header>
+                常规
+              </v-expansion-panel-header>
+              <v-expansion-panel-content>
+                <pre style="background-color: #f6f8fa;">
+
+    GET    /{resource}
+    GET    /{resource}/:id
+    POST   /{resource}
+    PUT    /{resource}/:id
+    PATCH  /{resource}/:id
+    DELETE /{resource}/:id
+                </pre>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+            <v-expansion-panel>
+              <v-expansion-panel-header>
+                过滤（Filter）
+              </v-expansion-panel-header>
+              <v-expansion-panel-content>
+                <pre style="background-color: #f6f8fa;">
+
+    GET /{resource}?key1=value1&key2=value2
+    GET /{resource}?id=1&id=2
+    GET /{resource}?key.childKey=value
+                </pre>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+            <v-expansion-panel>
+              <v-expansion-panel-header>
+                分页（Paginate）
+              </v-expansion-panel-header>
+              <v-expansion-panel-content>
+                <pre style="background-color: #f6f8fa;">
+
+    GET /{resource}?_page=5&_limit=10
+    GET /{resource}?_page=5
+                </pre>
+                <p class="font-italic mt-2">
+                  默认返回 10 条
+                </p>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+            <v-expansion-panel>
+              <v-expansion-panel-header>
+                排序（Sort）
+              </v-expansion-panel-header>
+              <v-expansion-panel-content>
+                <pre style="background-color: #f6f8fa;">
+
+    GET /{resource}?_sort=key&_order=asc
+    GET /{resource}/:id/{childResource}?_sort=key&_order=asc
+    GET /{resource}?_sort=key1,key2&_order=desc,asc
+                </pre>
+                <p class="font-italic mt-2">
+                  asc - 升序（默认）, desc - 降序
+                </p>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+            <v-expansion-panel>
+              <v-expansion-panel-header>
+                切片（Slice）
+              </v-expansion-panel-header>
+              <v-expansion-panel-content>
+                <pre style="background-color: #f6f8fa;">
+
+    GET /{resource}?_start=20&_end=30
+    GET /{resource}/:id/{childResource}?_start=20&_end=30
+    GET /{resource}/:id/{childResource}?_start=20&_limit=10
+                </pre>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+            <v-expansion-panel>
+              <v-expansion-panel-header>
+                操作符（Operators）
+              </v-expansion-panel-header>
+              <v-expansion-panel-content>
+                <pre style="background-color: #f6f8fa;">
+
+    GET /{resource}?key_gte=10&key_lte=20
+    GET /{resource}?id_ne=1
+    GET /{resource}?key_like=value （支持正则表达式）
+                </pre>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+            <v-expansion-panel>
+              <v-expansion-panel-header>
+                全文搜索（Full-text search）
+              </v-expansion-panel-header>
+              <v-expansion-panel-content>
+                <pre style="background-color: #f6f8fa;">
+
+    GET /{resource}?q=value
+                </pre>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+            <v-expansion-panel>
+              <v-expansion-panel-header>
+                关联查询（Relationships）
+              </v-expansion-panel-header>
+              <v-expansion-panel-content>
+                <pre style="background-color: #f6f8fa;">
+
+    GET /{resource}?_embed={childResource}
+    GET /{resource}/1?_embed={childResource}
+    GET /{resource}?_expand={parentResource}
+    GET /{resource}/1?_expand={parentResource}
+                </pre>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+            <v-expansion-panel>
+              <v-expansion-panel-header>
+                所有数据（All Data）
+              </v-expansion-panel-header>
+              <v-expansion-panel-content>
+                <pre style="background-color: #f6f8fa;">
+    
+    GET /{resource}/db
+                </pre>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+            <v-expansion-panel>
+              <v-expansion-panel-header>
+                路由映射（Routes Map）
+              </v-expansion-panel-header>
+              <v-expansion-panel-content>
+                <span class="d-block my-2"
+                  >在
+                  <span style="background-color: #f6f8fa;">/dbs/{dbName}/routes-map.json</span>
+                  文件中配置，以下为参考：</span
+                >
+                <pre style="background-color: #f6f8fa;">
+
+    {
+      "/hehe": "/users?name_like=^张",
+      "/api/*": "/$1",
+      "/:resource/:id/show": "/:resource/:id",
+      "/posts/:category": "/posts?category=:category",
+      "/articles\\?id=:id": "/posts/:id"
+    }
+                </pre>
+                <span class="d-block my-2">现在您可以这样访问：</span>
+                <pre style="background-color: #f6f8fa;">
+    
+    /hehe # → /users?name_like=^张
+    /api/posts # → /posts
+    /api/posts/1  # → /posts/1
+    /posts/1/show # → /posts/1
+    /posts/javascript # → /posts?category=javascript
+    /articles?id=1 # → /posts/1
+                </pre>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+          </v-expansion-panels>
+        </v-card>
       </v-card-text>
     </v-card>
 
@@ -118,9 +284,22 @@
             ref="collectionNameFieldRef"
             label="名称"
             autofocus
-            clearable
-            v-model="addCollectionDialog.form.data.name"
-            :rules="[rules.required, (v) => !collections.some((c) => c.name === v) || '英雄，这个集合已经存在了哦~']"
+            v-model.trim="addCollectionDialog.form.data.name"
+            :rules="[
+              (v) => (v && v.trim().length > 0) || '英雄，这个必须要填哦~',
+              (v) => (v && /^[a-zA-Z_]/.test(v.trim())) || '英雄，请用字母或下划线开头哦~',
+              (v) => (v && v.trim().length >= 2) || '英雄，最少两个字符哦~',
+              (v) => (v && /^[a-zA-Z_]\w+$/.test(v.trim())) || '英雄，只能由字母、数字、下划线组成哦~',
+              (v) => (v && !collections.some((c) => c.name === v.trim())) || '英雄，这个集合已经存在了哦~',
+            ]"
+            @keyup.enter="onSubmitOfCollectionDialog"
+            :loading="isLoadingOfAddCollection"
+            :disabled="isLoadingOfAddCollection"
+          ></v-text-field>
+
+          <v-text-field
+            label="描述"
+            v-model.trim="addCollectionDialog.form.data.description"
             @keyup.enter="onSubmitOfCollectionDialog"
             :loading="isLoadingOfAddCollection"
             :disabled="isLoadingOfAddCollection"
@@ -140,10 +319,10 @@
       </v-card>
     </v-dialog>
 
-    <v-snackbar v-model="snackbar.visible" centered timeout="3000">
+    <v-snackbar v-model="snackbar.visible" top timeout="2000">
       {{ snackbar.text }}
       <template #action="{ attrs }">
-        <v-btn color="pink" icon v-bind="attrs" @click="snackbar.visible = false">
+        <v-btn icon v-bind="attrs" @click="snackbar.visible = false">
           <v-icon>mdi-close</v-icon>
         </v-btn>
       </template>
@@ -162,6 +341,7 @@ export default {
   },
   data() {
     return {
+      curOperateId: 0,
       isLoadingOfServer: false,
       snackbar: {
         visible: false,
@@ -169,14 +349,12 @@ export default {
       },
       isLoading: true,
       isLoadingOfAddCollection: false,
-      rules: {
-        required: (v) => !!v || '英雄，这个必须要填哦~',
-      },
       addCollectionDialog: {
         visible: false,
         form: {
           data: {
             name: '',
+            description: '',
           },
         },
       },
@@ -270,6 +448,7 @@ export default {
     },
     del(collection, i) {
       if (this.isLoading) return;
+      this.curOperateId = collection.id;
       this.isLoading = true;
       this.$request({
         method: 'DELETE',
@@ -282,6 +461,7 @@ export default {
           this.collections.splice(i, 1);
         })
         .finally(() => {
+          this.curOperateId = 0;
           this.isLoading = false;
         });
     },
@@ -293,11 +473,15 @@ export default {
           url: '/collections',
           data: { ...this.addCollectionDialog.form.data, dbId: parseInt(this.dbId) },
         })
+          .then((res) => new Promise((resolve) => setTimeout(() => resolve(res), 300)))
           .then((res) => {
             this.collections.push(res.data);
-            this.addCollectionDialog.form.data.name = '';
+            // this.addCollectionDialog.form.data.name = '';
             this.$refs.collectionNameFieldRef.reset();
-            return new Promise((resolve) => setTimeout(resolve, 300));
+            this.addCollectionDialog.form.data.description = '';
+            setTimeout(() => {
+              this.$refs.collectionNameFieldRef.$refs.input.focus();
+            }, 0);
           })
           .finally(() => {
             this.isLoadingOfAddCollection = false;

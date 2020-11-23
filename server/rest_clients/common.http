@@ -1,4 +1,4 @@
-@baseurl=http://localhost:6661
+@baseurl=http://localhost:5001
 
 ###
 # 获取所有数据
@@ -37,4 +37,4 @@ Content-Type: application/json
 
 ###
 # 检查端口是否被占用
-GET {{baseurl}}/checkPortIsInUse?port=6661
+GET {{baseurl}}/checkPortIsInUse?port=5001

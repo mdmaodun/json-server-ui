@@ -6,6 +6,6 @@ module.exports = (cmd) => {
     console.log('stdout:' + stdout);
     console.log('stderr:' + stderr);
   });
-  console.log(childProcess.pid, 'childProcess.pid');
+  // console.log(childProcess.pid, 'childProcess.pid');
   return childProcess;
 };
