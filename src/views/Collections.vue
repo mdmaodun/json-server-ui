@@ -250,17 +250,28 @@
                 <pre style="background-color: #f6f8fa;">
 
     {
-      "/hehe": "/users?name_like=^张",
+      "/users/lastname/:lastname": "/users?name_like=^:lastname",
+      "/users/minage/:minage": "/users?age_gte=:minage",
+      "/users/lastname/:name/minage/:age": "/users?name_like=^:name&age_gte=:age",
+
       "/api/*": "/$1",
       "/:resource/:id/show": "/:resource/:id",
       "/posts/:category": "/posts?category=:category",
       "/articles\\?id=:id": "/posts/:id"
     }
                 </pre>
-                <span class="d-block my-2">现在您可以这样访问：</span>
+                <span class="d-block my-2">现在，你就可以这样访问：</span>
                 <pre style="background-color: #f6f8fa;">
     
-    /hehe # → /users?name_like=^张
+    # 获取姓张的所有用户
+    /users/lastname/张 # → /users?name_like=^张
+
+    # 获取大于等于18岁的所有用户
+    /users/minage/18 # → /users?age_gte=18
+
+    # 获取姓张并且大于等于18岁的所有用户
+    /users/lastname/张/minage/18 # → /users?name_like=^张&age_gte=18
+
     /api/posts # → /posts
     /api/posts/1  # → /posts/1
     /posts/1/show # → /posts/1
