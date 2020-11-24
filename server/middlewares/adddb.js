@@ -1,9 +1,9 @@
 const fs = require('fs');
 const path = require('path');
 const { dbsRootDirPath } = require('../utils/consts');
-if (!fs.existsSync(dbsRootDirPath)) {
-  fs.mkdirSync(dbsRootDirPath);
-}
+// if (!fs.existsSync(dbsRootDirPath)) {
+//   fs.mkdirSync(dbsRootDirPath);
+// }
 
 module.exports = (req, res, next) => {
   const { method, path: path2, body } = req;
