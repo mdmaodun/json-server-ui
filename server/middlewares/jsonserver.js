@@ -1,7 +1,7 @@
 const getdb = require('../utils/getdb');
 const { join } = require('path');
 const db = getdb(join(__dirname, '../db.json'));
-const runjsonserver = require('../utils/runjsonserver');
+const runJSONServerForDB = require('../utils/runJSONServerForDB');
 const { dbsRootDirPath } = require('../utils/consts');
 const killPort = require('kill-port');
 
@@ -24,7 +24,7 @@ module.exports = (req, res, next) => {
 
     const dbJsonFilePath = join(dbsRootDirPath, name, 'db.json');
 
-    runjsonserver({ dbJsonFilePath, port })
+    runJSONServerForDB({ dbJsonFilePath, port })
       .then(({ pid: processId }) => {
         dbOfLowdb.assign({ status: 'running', port, processId, utime }).write();
         res.send('ok.');

@@ -27,6 +27,7 @@
               :loading="db.status === 'running'"
               class="mt-5"
               clearable
+              @keyup.enter="runServer"
               :messages="db.status === 'running' ? '正在运行...' : ''"
               v-model="db.port"
               :rules="[
@@ -414,6 +415,7 @@ export default {
         });
     },
     runServer() {
+      if (this.isLoadingOfServer) return;
       if (this.collections.length === 0) {
         this.showSnackbar({ text: '英雄, 你还没有创建集合哦~' });
         return;

@@ -9,7 +9,7 @@
         </v-list-item-content>
       </v-list-item> -->
 
-      <v-list dense nav>
+      <v-list nav>
         <v-skeleton-loader v-show="!isShowDBList" type="text@3"></v-skeleton-loader>
         <p class="text--secondary" v-show="isShowDBList && dbs.length === 0">
           暂无数据库
@@ -23,9 +23,14 @@
                   <span>{{ db.name }}</span>
                 </v-list-item-title>
               </v-list-item-content>
-              <v-list-item-icon v-show="hover" @click.stop="del(db, i)">
+              <v-btn
+                icon
+                v-show="hover"
+                @click.stop="del(db, i)"
+                :loading="isLoadingOfDelDB && curOperationDBId === db.id"
+              >
                 <v-icon color="pink">mdi-delete</v-icon>
-              </v-list-item-icon>
+              </v-btn>
             </v-list-item>
           </template>
         </v-hover>
@@ -92,8 +97,11 @@
             label="名称"
             autofocus
             clearable
-            v-model="createDBDialog.form.data.name"
-            :rules="[rules.required, (v) => !dbs.some((db) => db.name === v) || '英雄，这个数据库已经存在了哦~']"
+            v-model.trim="createDBDialog.form.data.name"
+            :rules="[
+              (v) => (!!v && v.trim() !== '') || '英雄，这个必须要填哦~',
+              (v) => !dbs.some((db) => db.name === v) || '英雄，这个数据库已经存在了哦~',
+            ]"
             @keyup.enter="onSubmitOfCreateDBDialog"
             :loading="isLoadingOfCreateDB"
             :disabled="isLoadingOfCreateDB"
@@ -121,11 +129,10 @@ export default {
   name: 'App',
   data() {
     return {
+      curOperationDBId: 0,
+      isLoadingOfDelDB: false,
       isLoadingOfCreateDB: false,
       isShowDBList: false,
-      rules: {
-        required: (v) => !!v || '英雄，这个必须要填哦~',
-      },
       dbs: [],
       createDBDialog: {
         visible: false,
@@ -156,18 +163,27 @@ export default {
       }
     },
     del(db, i) {
+      if (this.isLoadingOfDelDB) return;
+      this.curOperationDBId = db.id;
+      this.isLoadingOfDelDB = true;
       this.$request({
         method: 'DELETE',
         url: `/dbs/${db.id}`,
-      }).then(() => {
-        this.dbs.splice(i, 1);
-        if (db.id == this.$route.params.dbId) {
-          this.$router.push('/');
-        }
-      });
+      })
+        .then(() => Promise.delayResolve(300))
+        .then(() => {
+          this.dbs.splice(i, 1);
+          if (db.id == this.$route.params.dbId) {
+            this.$router.push('/');
+          }
+        })
+        .finally(() => {
+          this.isLoadingOfDelDB = false;
+          this.curOperationDBId = 0;
+        });
     },
     showCreateDBDialog() {
-      this.isLoadingOfCreateDB = false;
+      // this.isLoadingOfCreateDB = false;
       this.createDBDialog.visible = true;
     },
     hideOfCreateDBDialog() {
@@ -181,11 +197,14 @@ export default {
           url: '/dbs',
           data: this.createDBDialog.form.data,
         })
+          .then((res) => Promise.delayResolve(300, res))
           .then((res) => {
             this.dbs.push(res.data);
-            this.createDBDialog.form.data.name = '';
-            this.$refs.dbNameFieldRef.reset();
-            return new Promise((resolve) => setTimeout(resolve, 300));
+            // this.createDBDialog.form.data.name = '';
+            this.hideOfCreateDBDialog();
+            setTimeout(() => {
+              this.$refs.dbNameFieldRef.reset();
+            }, 0);
           })
           .finally(() => {
             this.isLoadingOfCreateDB = false;
