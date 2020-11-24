@@ -42,7 +42,7 @@ http://localhost:5000
 
   ```json
   {
-   	"/users/lastname/:lastname": "/users?name_like=^:lastname",
+    "/users/lastname/:lastname": "/users?name_like=^:lastname",
     "/users/minage/:minage": "/users?age_gte=:minage",
     "/users/lastname/:name/minage/:age": "/users?name_like=^:name&age_gte=:age",
     
