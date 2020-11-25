@@ -56,7 +56,7 @@
           <v-subheader class="d-inline pa-0" style="height: unset;">这是一个次奥🐓简单的 json-server 图形化管理界面！🙂</v-subheader>
         </div> -->
         <v-toolbar-title>JSON-SERVER-UI</v-toolbar-title>
-        <v-subheader>这是一个次奥🐓简单的 json-server 图形化管理界面！🙂</v-subheader>
+        <v-subheader>这是一个次奥🐓简单的 JSON-SERVER 图形化管理界面！🙂</v-subheader>
       </div>
 
       <v-spacer></v-spacer>

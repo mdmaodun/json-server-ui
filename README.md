@@ -1,5 +1,5 @@
 # json-server-ui
-> 这是一个次奥🐓简单的 [json-server](https://github.com/typicode/json-server) 图形化管理界面，欢迎试用！Star 思密达~ 🙂
+> 这是一个次奥🐓简单的 [JSON-SERVER](https://github.com/typicode/json-server) 图形化管理界面，欢迎试用！Star 思密达~ 🙂
 
 ## 下载
 
@@ -35,6 +35,70 @@ http://localhost:5000
 - 多操作系统兼容（MacOS、Windows、Linux）
 
 - 启动端口检查
+
+- 多文件上传
+
+  支持多文件上传：最多 **12** 个
+
+  请求参数名：**files**
+
+  支持的文件后缀类型：**.txt**, **.md**, **.xmind**, **.json**, **.json5**, **.xml**, **.svg**,  **.jpg**, **.png**, **.jpeg**, **.gif**,  **.ppt**, **.pptx**, **.doc**, **.docx**, **.xls**, **.xlsx**, **.pdf**, **.zip**, **.tar**, **.gz**, **.tar.gz**, **.7z**
+
+  REST CLIENT 请求示例：
+
+  ```
+  POST /upload
+  Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+  
+  ------WebKitFormBoundary7MA4YWxkTrZu0gW
+  Content-Disposition: form-data; name="files"; filename="xxx.jpg"
+  Content-Type: image/jpeg
+  
+  < /path/to/xxx.jpg
+  
+  ------WebKitFormBoundary7MA4YWxkTrZu0gW
+  Content-Disposition: form-data; name="files"; filename="xxx.png"
+  Content-Type: image/png
+  
+  < /path/to/xxx.png
+  
+  ------WebKitFormBoundary7MA4YWxkTrZu0gW--
+  ```
+
+  响应数据形如：
+
+  ```json
+  {
+    "code": 200,
+    "msg": "ok.",
+    "data": {
+      "files": [
+        {
+          "fieldname": "files",
+          "originalname": "xxx.jpg",
+          "encoding": "7bit",
+          "mimetype": "image/jpeg",
+          "destination": "/Users/mdmaodun/git-repository/json-server-ui/server/public/uploads",
+          "filename": "20201125-163613-889-274d5e5d-9d64-4d7b-a226-c11a8716cf9b.jpg",
+          "path": "/Users/mdmaodun/git-repository/json-server-ui/server/public/uploads/20201125-163613-889-274d5e5d-9d64-4d7b-a226-c11a8716cf9b.jpg",
+          "size": 8028,
+          "url": "http://localhost:3000/uploads/20201125-163613-889-274d5e5d-9d64-4d7b-a226-c11a8716cf9b.jpg"
+        },
+        {
+          "fieldname": "files",
+          "originalname": "xxx.png",
+          "encoding": "7bit",
+          "mimetype": "image/png",
+          "destination": "/Users/mdmaodun/git-repository/json-server-ui/server/public/uploads",
+          "filename": "20201125-163613-892-e2362328-23a0-4cbb-ae5a-9856b8659a9b.png",
+          "path": "/Users/mdmaodun/git-repository/json-server-ui/server/public/uploads/20201125-163613-892-e2362328-23a0-4cbb-ae5a-9856b8659a9b.png",
+          "size": 3222,
+          "url": "http://localhost:3000/uploads/20201125-163613-892-e2362328-23a0-4cbb-ae5a-9856b8659a9b.png"
+        }
+      ]
+    }
+  }
+  ```
 
 - 路由映射
 
@@ -117,3 +181,4 @@ http://localhost:5000
   第三步，访问路径：`/sayHi?name=王二麻子` 
   
   
+

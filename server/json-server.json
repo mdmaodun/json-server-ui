@@ -7,7 +7,8 @@
     "middlewares/deldb.js",
     "middlewares/addcollection.js",
     "middlewares/delcollection.js",
-    "middlewares/jsonserver.js"
+    "middlewares/jsonserver.js",
+    "middlewares/upload.js"
   ],
   "watch": true
 }

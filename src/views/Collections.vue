@@ -239,6 +239,97 @@
             </v-expansion-panel>
             <v-expansion-panel>
               <v-expansion-panel-header>
+                文件上传（File Upload）
+              </v-expansion-panel-header>
+              <v-expansion-panel-content>
+                <p class="font-italic my-2">
+                  支持多文件上传：最多 <span class="pink--text font-weight-bold">12</span> 个
+                </p>
+                <p class="font-italic my-2">请求参数名：<span class="font-weight-bold pink--text">files</span></p>
+                <p class="font-italic my-2">
+                  支持的文件后缀类型：
+                  <span class="pink--text font-weight-bold">.txt</span>,
+                  <span class="pink--text font-weight-bold">.md</span>,
+                  <span class="pink--text font-weight-bold">.xmind</span>,
+                  <span class="pink--text font-weight-bold">.json</span>,
+                  <span class="pink--text font-weight-bold">.json5</span>,
+                  <span class="pink--text font-weight-bold">.xml</span>,
+                  <span class="pink--text font-weight-bold">.svg</span>,
+                  <span class="pink--text font-weight-bold">.jpg</span>,
+                  <span class="pink--text font-weight-bold">.png</span>,
+                  <span class="pink--text font-weight-bold">.jpeg</span>,
+                  <span class="pink--text font-weight-bold">.gif</span>,
+                  <span class="pink--text font-weight-bold">.ppt</span>,
+                  <span class="pink--text font-weight-bold">.pptx</span>,
+                  <span class="pink--text font-weight-bold">.doc</span>,
+                  <span class="pink--text font-weight-bold">.docx</span>,
+                  <span class="pink--text font-weight-bold">.xls</span>,
+                  <span class="pink--text font-weight-bold">.xlsx</span>,
+                  <span class="pink--text font-weight-bold">.pdf</span>,
+                  <span class="pink--text font-weight-bold">.zip</span>,
+                  <span class="pink--text font-weight-bold">.tar</span>,
+                  <span class="pink--text font-weight-bold">.gz</span>,
+                  <span class="pink--text font-weight-bold">.tar.gz</span>,
+                  <span class="pink--text font-weight-bold">.7z</span>
+                </p>
+                <p class="font-italic my-2">REST CLIENT 请求示例：</p>
+                <pre style="background-color: #f6f8fa;">
+    
+    POST /upload
+    Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+    ------WebKitFormBoundary7MA4YWxkTrZu0gW
+    Content-Disposition: form-data; name="files"; filename="xxx.jpg"
+    Content-Type: image/jpeg
+
+    &lt; /path/to/xxx.jpg
+
+    ------WebKitFormBoundary7MA4YWxkTrZu0gW
+    Content-Disposition: form-data; name="files"; filename="xxx.png"
+    Content-Type: image/png
+
+    &lt; /path/to/xxx.png
+
+    ------WebKitFormBoundary7MA4YWxkTrZu0gW--
+                </pre>
+                <p class="font-italic my-2">响应数据形如：</p>
+                <pre style="background-color: #f6f8fa;">
+
+    {
+      "code": 200,
+      "msg": "ok.",
+      "data": {
+        "files": [
+          {
+            "fieldname": "files",
+            "originalname": "xxx.jpg",
+            "encoding": "7bit",
+            "mimetype": "image/jpeg",
+            "destination": "/Users/andremao/git-repository/json-server-ui/server/public/uploads",
+            "filename": "20201125-163613-889-274d5e5d-9d64-4d7b-a226-c11a8716cf9b.jpg",
+            "path": "/Users/andremao/git-repository/json-server-ui/server/public/uploads/20201125-163613-889-274d5e5d-9d64-4d7b-a226-c11a8716cf9b.jpg",
+            "size": 8028,
+            "url": "http://localhost:3000/uploads/20201125-163613-889-274d5e5d-9d64-4d7b-a226-c11a8716cf9b.jpg"
+          },
+          {
+            "fieldname": "files",
+            "originalname": "xxx.png",
+            "encoding": "7bit",
+            "mimetype": "image/png",
+            "destination": "/Users/andremao/git-repository/json-server-ui/server/public/uploads",
+            "filename": "20201125-163613-892-e2362328-23a0-4cbb-ae5a-9856b8659a9b.png",
+            "path": "/Users/andremao/git-repository/json-server-ui/server/public/uploads/20201125-163613-892-e2362328-23a0-4cbb-ae5a-9856b8659a9b.png",
+            "size": 3222,
+            "url": "http://localhost:3000/uploads/20201125-163613-892-e2362328-23a0-4cbb-ae5a-9856b8659a9b.png"
+          }
+        ]
+      }
+    }
+                </pre>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+            <v-expansion-panel>
+              <v-expansion-panel-header>
                 路由映射（Routes Map）
               </v-expansion-panel-header>
               <v-expansion-panel-content>

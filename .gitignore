@@ -27,3 +27,6 @@ test*.js
 dbs
 
 server/db.json
+server/initdb.json
+
+server/public/uploads

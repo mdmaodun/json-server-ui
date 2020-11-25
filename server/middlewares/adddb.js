@@ -12,11 +12,16 @@ module.exports = (req, res, next) => {
     body.port = '';
     body.processId = '';
     const { name } = body;
-    fs.mkdirSync(path.join(dbsRootDirPath, name, 'middlewares'), { recursive: true });
-    fs.writeFileSync(path.join(dbsRootDirPath, name, 'routes-map.json'), '{}');
-
+    const dbDirPath = path.join(dbsRootDirPath, name);
+    const middlewaresDirPath = path.join(dbDirPath, 'middlewares');
+    const uploadMiddlewareFilePathDest = path.join(middlewaresDirPath, './upload.js');
+    fs.mkdirSync(middlewaresDirPath, { recursive: true });
+    if (!fs.existsSync(uploadMiddlewareFilePathDest)) {
+      fs.copyFileSync(path.join(__dirname, './upload.js'), uploadMiddlewareFilePathDest);
+    }
+    fs.writeFileSync(path.join(dbDirPath, 'routes-map.json'), '{}');
     fs.writeFileSync(
-      path.join(dbsRootDirPath, name, `db.json`),
+      path.join(dbDirPath, `db.json`),
       JSON.stringify(
         {
           db: {
