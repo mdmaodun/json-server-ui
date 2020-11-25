@@ -1,4 +1,4 @@
-# json-server-ui
+# JSON-SERVER-UI
 > 这是一个次奥🐓简单的 [JSON-SERVER](https://github.com/typicode/json-server) 图形化管理界面，欢迎试用！Star 思密达~ 🙂
 
 ## 下载
@@ -26,15 +26,11 @@ http://localhost:5000
 ```
 
 ## 特性
-- 在界面上点一点，即可拥有强大的 API 服务
+- 简单操作即可拥有强大的 REST API 服务
 
 - 多库、多集合管理
 
-- 独立进程启动、停止 API 服务
-
-- 多操作系统兼容（MacOS、Windows、Linux）
-
-- 启动端口检查
+- 独立进程启动&停止服务，启动端口预检
 
 - 多文件上传
 

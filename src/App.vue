@@ -19,7 +19,7 @@
             <v-list-item link @click="onDBClick(db)">
               <v-list-item-content>
                 <v-list-item-title>
-                  <v-icon class="mr-2">mdi-database</v-icon>
+                  <v-icon class="mr-2" :class="hover ? 'text--primary' : 'text--secondary'">mdi-database</v-icon>
                   <span>{{ db.name }}</span>
                 </v-list-item-title>
               </v-list-item-content>
@@ -42,22 +42,25 @@
     </v-navigation-drawer>
 
     <v-app-bar app>
-      <div class="d-flex align-center">
-        <v-img
-          alt="json-server-ui logo"
-          class="shrink mr-2"
-          contain
-          src="../src/assets/logo.svg"
-          transition="scale-transition"
-          width="40"
-        />
-        <!-- <div class="d-flex flex-column justify-center">
+      <v-hover #default="{ hover }">
+        <div class="d-flex align-center">
+          <v-img
+            alt="JSON-SERVER-UI logo"
+            class="shrink mr-2"
+            :class="hover ? 'rotate_360' : ''"
+            contain
+            src="../src/assets/logo.svg"
+            transition="scale-transition"
+            width="40"
+          />
+          <!-- <div class="d-flex flex-column justify-center">
           <v-toolbar-title>JSON-SERVER-UI</v-toolbar-title>
           <v-subheader class="d-inline pa-0" style="height: unset;">这是一个次奥🐓简单的 json-server 图形化管理界面！🙂</v-subheader>
         </div> -->
-        <v-toolbar-title>JSON-SERVER-UI</v-toolbar-title>
-        <v-subheader>这是一个次奥🐓简单的 JSON-SERVER 图形化管理界面！🙂</v-subheader>
-      </div>
+          <v-toolbar-title>JSON-SERVER-UI</v-toolbar-title>
+        </div>
+      </v-hover>
+      <v-subheader>这是一个次奥🐓简单的 JSON-SERVER 图形化管理界面！🙂</v-subheader>
 
       <v-spacer></v-spacer>
 
@@ -83,7 +86,7 @@
     </v-main>
 
     <v-footer padless>
-      <v-col class="text-center" cols="12"> © {{ new Date().getFullYear() }} — <strong>json-server-ui</strong> </v-col>
+      <v-col class="text-center" cols="12"> © {{ new Date().getFullYear() }} — <strong>JSON-SERVER-UI</strong> </v-col>
     </v-footer>
     <v-dialog v-model="createDBDialog.visible" max-width="500px">
       <v-card>
@@ -214,3 +217,10 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.rotate_360 {
+  transform: rotate(360deg);
+  transition: transform 1s;
+}
+</style>

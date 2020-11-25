@@ -8,8 +8,14 @@
 
         <v-toolbar elevation="0" class="ml-10">
           <v-tooltip bottom>
-            <template #activator="{ on, attrs }">
-              <v-btn icon v-bind="attrs" v-on="on" @click="showAddCollectionDialog">
+            <template #activator="{ on, attrs, value }">
+              <v-btn
+                icon
+                v-bind="attrs"
+                v-on="on"
+                @click="showAddCollectionDialog"
+                :class="value ? 'text--primary' : 'text-secondary'"
+              >
                 <v-icon>mdi-table-plus</v-icon>
               </v-btn>
             </template>
@@ -47,7 +53,7 @@
           </v-col>
 
           <v-tooltip bottom>
-            <template #activator="{ on, attrs }">
+            <template #activator="{ on, attrs, value }">
               <v-btn
                 icon
                 v-bind="attrs"
@@ -55,6 +61,7 @@
                 @click="runServer"
                 v-show="db.status === 'stopped'"
                 :loading="isLoadingOfServer"
+                :class="value ? 'text--primary' : 'text-secondary'"
               >
                 <v-icon>mdi-rocket-launch-outline</v-icon>
               </v-btn>
@@ -63,7 +70,7 @@
           </v-tooltip>
 
           <v-tooltip bottom>
-            <template #activator="{ on, attrs }">
+            <template #activator="{ on, attrs, value }">
               <v-btn
                 icon
                 v-bind="attrs"
@@ -71,11 +78,33 @@
                 @click="stopServer"
                 v-show="db.status === 'running'"
                 :loading="isLoadingOfServer"
+                :class="value ? 'text--primary' : 'text-secondary'"
               >
                 <v-icon>mdi-stop-circle-outline</v-icon>
               </v-btn>
             </template>
             <span>停止服务</span>
+          </v-tooltip>
+
+          <v-divider v-show="db.status === 'running'" vertical inset class="mx-4"></v-divider>
+
+          <v-tooltip bottom>
+            <template #activator="{ on, attrs }">
+              <v-btn
+                v-on="on"
+                v-bind="attrs"
+                v-show="db.status === 'running'"
+                text
+                color="teal"
+                class="text-lowercase"
+                :href="`http://localhost:${db.port}/db`"
+                target="_blank"
+              >
+                <v-icon small class="mr-1">mdi-code-json</v-icon>
+                <span>http://localhost:{{ db.port }}/db</span>
+              </v-btn>
+            </template>
+            <span>获取所有 DB 数据</span>
           </v-tooltip>
         </v-toolbar>
       </v-card-title>
@@ -85,30 +114,73 @@
         </p>
         <v-row>
           <v-col v-for="(v, i) in collections" :key="v.id" cols="3" class="float-left">
-            <v-card :loading="curOperateId === v.id && isLoading" elevation="1">
-              <v-toolbar elevation="1">
-                <v-toolbar-title>
-                  <v-icon class="mr-2">mdi-table</v-icon>
-                  <span>{{ v.name }}</span>
-                </v-toolbar-title>
+            <v-hover>
+              <template #default="{ hover }">
+                <v-card :loading="curOperateId === v.id && isLoading" :elevation="hover ? '5': '1'">
+                  <v-toolbar elevation="1">
+                    <v-toolbar-title>
+                      <v-icon class="mr-2" :color="hover ? 'grey darken-4' : ''">mdi-table</v-icon>
+                      <span :class="hover ? 'text-primary' : 'text--secondary'">{{ v.name }}</span>
+                    </v-toolbar-title>
 
-                <v-spacer></v-spacer>
+                    <v-spacer></v-spacer>
 
-                <v-btn icon @click.stop="del(v, i)" :loading="curOperateId === v.id && isLoading">
-                  <v-icon color="pink">mdi-delete</v-icon>
-                </v-btn>
-              </v-toolbar>
+                    <v-btn v-show="hover" icon @click.stop="del(v, i)" :loading="curOperateId === v.id && isLoading">
+                      <v-icon color="pink">mdi-delete</v-icon>
+                    </v-btn>
+                  </v-toolbar>
 
-              <v-subheader>
-                <span>{{ v.description || '暂无描述' }}</span>
-              </v-subheader>
-            </v-card>
+                  <v-subheader>
+                    <span>{{ v.description || '暂无描述' }}</span>
+                  </v-subheader>
+
+                  <v-tooltip bottom>
+                    <template #activator="{ on, attrs }">
+                      <v-btn
+                        v-on="on"
+                        v-bind="attrs"
+                        v-show="db.status === 'running'"
+                        text
+                        block
+                        color="teal"
+                        class="text-lowercase justify-start"
+                        :href="`http://localhost:${db.port}/${v.name}`"
+                        target="_blank"
+                      >
+                        <v-icon small class="mr-1">mdi-code-json</v-icon>
+                        <span>http://localhost:{{ db.port }}/{{ v.name }}</span>
+                      </v-btn>
+                    </template>
+                    <span>获取列表数据</span>
+                  </v-tooltip>
+                  <v-tooltip bottom>
+                    <template #activator="{ on, attrs }">
+                      <v-btn
+                        v-on="on"
+                        v-bind="attrs"
+                        v-show="db.status === 'running'"
+                        text
+                        block
+                        color="teal"
+                        class="text-lowercase justify-start"
+                        :href="`http://localhost:${db.port}/${v.name}/1`"
+                        target="_blank"
+                      >
+                        <v-icon small class="mr-1">mdi-code-json</v-icon>
+                        <span>http://localhost:{{ db.port }}/{{ v.name }}/1</span>
+                      </v-btn>
+                    </template>
+                    <span>获取 id 为 1 的数据</span>
+                  </v-tooltip>
+                </v-card>
+              </template>
+            </v-hover>
           </v-col>
         </v-row>
 
         <v-card class="mt-4">
           <v-toolbar elevation="0">
-            <v-toolbar-title>API 指南</v-toolbar-title>
+            <v-toolbar-title>API 指北</v-toolbar-title>
             <v-subheader
               >占位符：{resource} - 集合名, {childResource} - 关联子集合名, {parentResource} - 关联父集合名, {dbName} -
               数据库名</v-subheader
@@ -422,13 +494,22 @@
       </v-card>
     </v-dialog>
 
-    <v-snackbar v-model="snackbar.visible" top timeout="2000">
-      {{ snackbar.text }}
-      <template #action="{ attrs }">
+    <v-snackbar
+      v-model="snackbar.visible"
+      top
+      right
+      timeout="2500"
+      shaped
+      :color="snackbar.color"
+      @input="onChangeOfSnackbar"
+    >
+      <v-icon v-show="snackbar.icon" class="mr-1 pb-1">{{ snackbar.icon }}</v-icon>
+      <span class="">{{ snackbar.text }}</span>
+      <!-- <template #action="{ attrs }">
         <v-btn icon v-bind="attrs" @click="snackbar.visible = false">
           <v-icon>mdi-close</v-icon>
         </v-btn>
-      </template>
+      </template> -->
     </v-snackbar>
   </div>
 </template>
@@ -449,6 +530,7 @@ export default {
       snackbar: {
         visible: false,
         text: '',
+        color: '',
       },
       isLoading: true,
       isLoadingOfAddCollection: false,
@@ -494,8 +576,18 @@ export default {
     },
   },
   methods: {
-    showSnackbar({ text }) {
+    onChangeOfSnackbar() {
+      if (!this.snackbar.visible) {
+        setTimeout(() => {
+          this.snackbar.color = '';
+          this.snackbar.icon = '';
+        }, 200);
+      }
+    },
+    showSnackbar({ text, color, icon }) {
       this.snackbar.text = text;
+      this.snackbar.color = color;
+      this.snackbar.icon = icon;
       this.snackbar.visible = true;
     },
     stopServer() {
@@ -512,18 +604,18 @@ export default {
           this.db.status = 'stopped';
         })
         .finally(() => {
-          this.showSnackbar({ text: '已停止' });
+          this.showSnackbar({ text: '已停止', color: 'green', icon: 'mdi-stop' });
           this.isLoadingOfServer = false;
         });
     },
     runServer() {
       if (this.isLoadingOfServer) return;
       if (this.collections.length === 0) {
-        this.showSnackbar({ text: '英雄, 你还没有创建集合哦~' });
+        this.showSnackbar({ text: '英雄, 你还没有创建集合哦~', color: 'pink' });
         return;
       }
       if (!this.db.port) {
-        this.showSnackbar({ text: '英雄, 先设置一个端口号哈~ 😁' });
+        this.showSnackbar({ text: '英雄, 先设置一个端口号哈~ 😁', color: 'pink' });
         return;
       }
       if (!this.$refs.portTextFieldRef.validate(true)) {
@@ -541,10 +633,10 @@ export default {
         .then(() => new Promise((resolve) => setTimeout(resolve, 300)))
         .then(() => {
           this.db.status = 'running';
-          this.showSnackbar({ text: '已启动' });
+          this.showSnackbar({ text: '启动成功', color: 'green', icon: 'mdi-fire' });
         })
         .catch((err) => {
-          this.showSnackbar({ text: '英雄! 这个端口被占用了哦! 😮 换个试试~' });
+          this.showSnackbar({ text: '英雄! 这个端口被占用了哦! 😮 换个试试~', color: 'pink' });
         })
         .finally(() => {
           this.isLoadingOfServer = false;
