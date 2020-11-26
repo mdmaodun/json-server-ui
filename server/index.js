@@ -8,7 +8,7 @@ const initdbFilePath = join(__dirname, './initdb.json');
 
 module.exports = () => {
   const initJSON = {
-    db: {
+    _db: {
       version: '1.0.0',
     },
     dbs: [],

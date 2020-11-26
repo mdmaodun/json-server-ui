@@ -21,7 +21,7 @@ module.exports = (req, res, next) => {
   if (method === 'GET' && path === '/backup') {
     const version = db
       .read()
-      .get('db.version')
+      .get('_db.version')
       .value();
     if (version) {
       const dirPath = join(__dirname, '../backups');
@@ -32,7 +32,7 @@ module.exports = (req, res, next) => {
         res.send('ok');
       });
     } else {
-      res.status(404).send('missing db.version at db.json file.');
+      res.status(404).send('missing _db.version at db.json file.');
     }
     return;
   }

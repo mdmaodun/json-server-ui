@@ -2,7 +2,7 @@
   <div class="collections">
     <v-card elevation="0" :loading="isLoading">
       <v-card-title>
-        <v-icon color="black" class="mr-2">mdi-database</v-icon>
+        <v-icon large color="black" class="mr-2">mdi-database</v-icon>
 
         <h2>{{ db.name }}</h2>
 
@@ -116,7 +116,7 @@
           <v-col v-for="(v, i) in collections" :key="v.id" cols="3" class="float-left">
             <v-hover>
               <template #default="{ hover }">
-                <v-card :loading="curOperateId === v.id && isLoading" :elevation="hover ? '5': '1'">
+                <v-card :loading="curOperateId === v.id && isLoading" :elevation="hover ? '5' : '1'">
                   <v-toolbar elevation="1">
                     <v-toolbar-title>
                       <v-icon class="mr-2" :color="hover ? 'grey darken-4' : ''">mdi-table</v-icon>
@@ -148,7 +148,7 @@
                         target="_blank"
                       >
                         <v-icon small class="mr-1">mdi-code-json</v-icon>
-                        <span>http://localhost:{{ db.port }}/{{ v.name }}</span>
+                        <span class="body-2">http://localhost:{{ db.port }}/{{ v.name }}</span>
                       </v-btn>
                     </template>
                     <span>获取列表数据</span>
@@ -167,7 +167,7 @@
                         target="_blank"
                       >
                         <v-icon small class="mr-1">mdi-code-json</v-icon>
-                        <span>http://localhost:{{ db.port }}/{{ v.name }}/1</span>
+                        <span class="body-2">http://localhost:{{ db.port }}/{{ v.name }}/1</span>
                       </v-btn>
                     </template>
                     <span>获取 id 为 1 的数据</span>
@@ -177,274 +177,6 @@
             </v-hover>
           </v-col>
         </v-row>
-
-        <v-card class="mt-4">
-          <v-toolbar elevation="0">
-            <v-toolbar-title>API 指北</v-toolbar-title>
-            <v-subheader
-              >占位符：{resource} - 集合名, {childResource} - 关联子集合名, {parentResource} - 关联父集合名, {dbName} -
-              数据库名</v-subheader
-            >
-          </v-toolbar>
-          <v-expansion-panels accordion>
-            <v-expansion-panel>
-              <v-expansion-panel-header>
-                常规
-              </v-expansion-panel-header>
-              <v-expansion-panel-content>
-                <pre style="background-color: #f6f8fa;">
-
-    GET    /{resource}
-    GET    /{resource}/:id
-    POST   /{resource}
-    PUT    /{resource}/:id
-    PATCH  /{resource}/:id
-    DELETE /{resource}/:id
-                </pre>
-              </v-expansion-panel-content>
-            </v-expansion-panel>
-            <v-expansion-panel>
-              <v-expansion-panel-header>
-                过滤（Filter）
-              </v-expansion-panel-header>
-              <v-expansion-panel-content>
-                <pre style="background-color: #f6f8fa;">
-
-    GET /{resource}?key1=value1&key2=value2
-    GET /{resource}?id=1&id=2
-    GET /{resource}?key.childKey=value
-                </pre>
-              </v-expansion-panel-content>
-            </v-expansion-panel>
-            <v-expansion-panel>
-              <v-expansion-panel-header>
-                分页（Paginate）
-              </v-expansion-panel-header>
-              <v-expansion-panel-content>
-                <pre style="background-color: #f6f8fa;">
-
-    GET /{resource}?_page=5&_limit=10
-    GET /{resource}?_page=5
-                </pre>
-                <p class="font-italic mt-2">
-                  默认返回 10 条
-                </p>
-              </v-expansion-panel-content>
-            </v-expansion-panel>
-            <v-expansion-panel>
-              <v-expansion-panel-header>
-                排序（Sort）
-              </v-expansion-panel-header>
-              <v-expansion-panel-content>
-                <pre style="background-color: #f6f8fa;">
-
-    GET /{resource}?_sort=key&_order=asc
-    GET /{resource}/:id/{childResource}?_sort=key&_order=asc
-    GET /{resource}?_sort=key1,key2&_order=desc,asc
-                </pre>
-                <p class="font-italic mt-2">
-                  asc - 升序（默认）, desc - 降序
-                </p>
-              </v-expansion-panel-content>
-            </v-expansion-panel>
-            <v-expansion-panel>
-              <v-expansion-panel-header>
-                切片（Slice）
-              </v-expansion-panel-header>
-              <v-expansion-panel-content>
-                <pre style="background-color: #f6f8fa;">
-
-    GET /{resource}?_start=20&_end=30
-    GET /{resource}/:id/{childResource}?_start=20&_end=30
-    GET /{resource}/:id/{childResource}?_start=20&_limit=10
-                </pre>
-              </v-expansion-panel-content>
-            </v-expansion-panel>
-            <v-expansion-panel>
-              <v-expansion-panel-header>
-                操作符（Operators）
-              </v-expansion-panel-header>
-              <v-expansion-panel-content>
-                <pre style="background-color: #f6f8fa;">
-
-    GET /{resource}?key_gte=10&key_lte=20
-    GET /{resource}?id_ne=1
-    GET /{resource}?key_like=value （支持正则表达式）
-                </pre>
-              </v-expansion-panel-content>
-            </v-expansion-panel>
-            <v-expansion-panel>
-              <v-expansion-panel-header>
-                全文搜索（Full-text search）
-              </v-expansion-panel-header>
-              <v-expansion-panel-content>
-                <pre style="background-color: #f6f8fa;">
-
-    GET /{resource}?q=value
-                </pre>
-              </v-expansion-panel-content>
-            </v-expansion-panel>
-            <v-expansion-panel>
-              <v-expansion-panel-header>
-                关联查询（Relationships）
-              </v-expansion-panel-header>
-              <v-expansion-panel-content>
-                <pre style="background-color: #f6f8fa;">
-
-    GET /{resource}?_embed={childResource}
-    GET /{resource}/1?_embed={childResource}
-    GET /{resource}?_expand={parentResource}
-    GET /{resource}/1?_expand={parentResource}
-                </pre>
-              </v-expansion-panel-content>
-            </v-expansion-panel>
-            <v-expansion-panel>
-              <v-expansion-panel-header>
-                所有数据（All Data）
-              </v-expansion-panel-header>
-              <v-expansion-panel-content>
-                <pre style="background-color: #f6f8fa;">
-    
-    GET /{resource}/db
-                </pre>
-              </v-expansion-panel-content>
-            </v-expansion-panel>
-            <v-expansion-panel>
-              <v-expansion-panel-header>
-                文件上传（File Upload）
-              </v-expansion-panel-header>
-              <v-expansion-panel-content>
-                <p class="font-italic my-2">
-                  支持多文件上传：最多 <span class="pink--text font-weight-bold">12</span> 个
-                </p>
-                <p class="font-italic my-2">请求参数名：<span class="font-weight-bold pink--text">files</span></p>
-                <p class="font-italic my-2">
-                  支持的文件后缀类型：
-                  <span class="pink--text font-weight-bold">.txt</span>,
-                  <span class="pink--text font-weight-bold">.md</span>,
-                  <span class="pink--text font-weight-bold">.xmind</span>,
-                  <span class="pink--text font-weight-bold">.json</span>,
-                  <span class="pink--text font-weight-bold">.json5</span>,
-                  <span class="pink--text font-weight-bold">.xml</span>,
-                  <span class="pink--text font-weight-bold">.svg</span>,
-                  <span class="pink--text font-weight-bold">.jpg</span>,
-                  <span class="pink--text font-weight-bold">.png</span>,
-                  <span class="pink--text font-weight-bold">.jpeg</span>,
-                  <span class="pink--text font-weight-bold">.gif</span>,
-                  <span class="pink--text font-weight-bold">.ppt</span>,
-                  <span class="pink--text font-weight-bold">.pptx</span>,
-                  <span class="pink--text font-weight-bold">.doc</span>,
-                  <span class="pink--text font-weight-bold">.docx</span>,
-                  <span class="pink--text font-weight-bold">.xls</span>,
-                  <span class="pink--text font-weight-bold">.xlsx</span>,
-                  <span class="pink--text font-weight-bold">.pdf</span>,
-                  <span class="pink--text font-weight-bold">.zip</span>,
-                  <span class="pink--text font-weight-bold">.tar</span>,
-                  <span class="pink--text font-weight-bold">.gz</span>,
-                  <span class="pink--text font-weight-bold">.tar.gz</span>,
-                  <span class="pink--text font-weight-bold">.7z</span>
-                </p>
-                <p class="font-italic my-2">REST CLIENT 请求示例：</p>
-                <pre style="background-color: #f6f8fa;">
-    
-    POST /upload
-    Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
-
-    ------WebKitFormBoundary7MA4YWxkTrZu0gW
-    Content-Disposition: form-data; name="files"; filename="xxx.jpg"
-    Content-Type: image/jpeg
-
-    &lt; /path/to/xxx.jpg
-
-    ------WebKitFormBoundary7MA4YWxkTrZu0gW
-    Content-Disposition: form-data; name="files"; filename="xxx.png"
-    Content-Type: image/png
-
-    &lt; /path/to/xxx.png
-
-    ------WebKitFormBoundary7MA4YWxkTrZu0gW--
-                </pre>
-                <p class="font-italic my-2">响应数据形如：</p>
-                <pre style="background-color: #f6f8fa;">
-
-    {
-      "code": 200,
-      "msg": "ok.",
-      "data": {
-        "files": [
-          {
-            "fieldname": "files",
-            "originalname": "xxx.jpg",
-            "encoding": "7bit",
-            "mimetype": "image/jpeg",
-            "destination": "/Users/andremao/git-repository/json-server-ui/server/public/uploads",
-            "filename": "20201125-163613-889-274d5e5d-9d64-4d7b-a226-c11a8716cf9b.jpg",
-            "path": "/Users/andremao/git-repository/json-server-ui/server/public/uploads/20201125-163613-889-274d5e5d-9d64-4d7b-a226-c11a8716cf9b.jpg",
-            "size": 8028,
-            "url": "http://localhost:3000/uploads/20201125-163613-889-274d5e5d-9d64-4d7b-a226-c11a8716cf9b.jpg"
-          },
-          {
-            "fieldname": "files",
-            "originalname": "xxx.png",
-            "encoding": "7bit",
-            "mimetype": "image/png",
-            "destination": "/Users/andremao/git-repository/json-server-ui/server/public/uploads",
-            "filename": "20201125-163613-892-e2362328-23a0-4cbb-ae5a-9856b8659a9b.png",
-            "path": "/Users/andremao/git-repository/json-server-ui/server/public/uploads/20201125-163613-892-e2362328-23a0-4cbb-ae5a-9856b8659a9b.png",
-            "size": 3222,
-            "url": "http://localhost:3000/uploads/20201125-163613-892-e2362328-23a0-4cbb-ae5a-9856b8659a9b.png"
-          }
-        ]
-      }
-    }
-                </pre>
-              </v-expansion-panel-content>
-            </v-expansion-panel>
-            <v-expansion-panel>
-              <v-expansion-panel-header>
-                路由映射（Routes Map）
-              </v-expansion-panel-header>
-              <v-expansion-panel-content>
-                <span class="d-block my-2"
-                  >在
-                  <span style="background-color: #f6f8fa;">/dbs/{dbName}/routes-map.json</span>
-                  文件中配置，以下为参考：</span
-                >
-                <pre style="background-color: #f6f8fa;">
-
-    {
-      "/users/lastname/:lastname": "/users?name_like=^:lastname",
-      "/users/minage/:minage": "/users?age_gte=:minage",
-      "/users/lastname/:name/minage/:age": "/users?name_like=^:name&age_gte=:age",
-
-      "/api/*": "/$1",
-      "/:resource/:id/show": "/:resource/:id",
-      "/posts/:category": "/posts?category=:category",
-      "/articles\\?id=:id": "/posts/:id"
-    }
-                </pre>
-                <span class="d-block my-2">现在，你就可以这样访问：</span>
-                <pre style="background-color: #f6f8fa;">
-    
-    # 获取姓张的所有用户
-    /users/lastname/张 # → /users?name_like=^张
-
-    # 获取大于等于18岁的所有用户
-    /users/minage/18 # → /users?age_gte=18
-
-    # 获取姓张并且大于等于18岁的所有用户
-    /users/lastname/张/minage/18 # → /users?name_like=^张&age_gte=18
-
-    /api/posts # → /posts
-    /api/posts/1  # → /posts/1
-    /posts/1/show # → /posts/1
-    /posts/javascript # → /posts?category=javascript
-    /articles?id=1 # → /posts/1
-                </pre>
-              </v-expansion-panel-content>
-            </v-expansion-panel>
-          </v-expansion-panels>
-        </v-card>
       </v-card-text>
     </v-card>
 
@@ -461,11 +193,12 @@
             autofocus
             v-model.trim="addCollectionDialog.form.data.name"
             :rules="[
-              (v) => (v && v.trim().length > 0) || '英雄，这个必须要填哦~',
-              (v) => (v && /^[a-zA-Z_]/.test(v.trim())) || '英雄，请用字母或下划线开头哦~',
-              (v) => (v && v.trim().length >= 2) || '英雄，最少两个字符哦~',
-              (v) => (v && /^[a-zA-Z_]\w+$/.test(v.trim())) || '英雄，只能由字母、数字、下划线组成哦~',
-              (v) => (v && !collections.some((c) => c.name === v.trim())) || '英雄，这个集合已经存在了哦~',
+              (v) => (v && v.trim().length > 0) || '英雄，这个必须要填哟~',
+              (v) => (v && /^[a-zA-Z_]/.test(v.trim())) || '英雄，需要用 字母 或 下划线 开头哟~',
+              (v) => (v && v.trim().length >= 2) || '英雄，最少 两个 字符哟~',
+              (v) => (v && /^[a-zA-Z_]\w+$/.test(v.trim())) || '英雄，只能由字母、数字、下划线组成哟~',
+              (v) => (v && /s$/.test(v.trim()) || '英雄，需要以小写 `s` 结尾哟~' ),
+              (v) => (v && !collections.some((c) => c.name === v.trim())) || '英雄，这个集合已经存在了哟~',
             ]"
             @keyup.enter="onSubmitOfCollectionDialog"
             :loading="isLoadingOfAddCollection"
@@ -494,15 +227,7 @@
       </v-card>
     </v-dialog>
 
-    <v-snackbar
-      v-model="snackbar.visible"
-      top
-      right
-      timeout="2500"
-      shaped
-      :color="snackbar.color"
-      @input="onChangeOfSnackbar"
-    >
+    <v-snackbar v-model="snackbar.visible" top right :timeout="snackbar.timeout" shaped :color="snackbar.color">
       <v-icon v-show="snackbar.icon" class="mr-1 pb-1">{{ snackbar.icon }}</v-icon>
       <span class="">{{ snackbar.text }}</span>
       <!-- <template #action="{ attrs }">
@@ -511,42 +236,57 @@
         </v-btn>
       </template> -->
     </v-snackbar>
+
+    <confirm-dialog ref="confirmDialog"></confirm-dialog>
   </div>
 </template>
 
 <script>
+import ConfirmDialog from '../components/ConfirmDialog';
 export default {
   name: 'Collections',
+
+  components: {
+    ConfirmDialog,
+  },
+
   props: {
     dbId: {
       type: Number,
       required: true,
     },
   },
-  data() {
-    return {
-      curOperateId: 0,
-      isLoadingOfServer: false,
-      snackbar: {
-        visible: false,
-        text: '',
-        color: '',
-      },
-      isLoading: true,
-      isLoadingOfAddCollection: false,
-      addCollectionDialog: {
-        visible: false,
-        form: {
-          data: {
-            name: '',
-            description: '',
-          },
+
+  data: () => ({
+    curOperateId: 0,
+    isLoadingOfServer: false,
+    snackbar: {
+      visible: false,
+      timeout: 2000,
+      text: '',
+      color: '',
+    },
+    isLoading: true,
+    isLoadingOfAddCollection: false,
+    addCollectionDialog: {
+      visible: false,
+      form: {
+        data: {
+          name: '',
+          description: '',
         },
       },
-      db: {},
-      collections: [],
-    };
+    },
+    db: {},
+    collections: [],
+  }),
+
+  computed: {
+    confirmDialog() {
+      return this.$refs.confirmDialog;
+    },
   },
+
   watch: {
     dbId: {
       immediate: true,
@@ -575,68 +315,79 @@ export default {
       },
     },
   },
+
   methods: {
     onChangeOfSnackbar() {
       if (!this.snackbar.visible) {
         setTimeout(() => {
           this.snackbar.color = '';
           this.snackbar.icon = '';
-        }, 200);
+        }, 100);
       }
     },
-    showSnackbar({ text, color, icon }) {
+    showSnackbar({ text = '', color = '', icon = '' }) {
       this.snackbar.text = text;
       this.snackbar.color = color;
       this.snackbar.icon = icon;
       this.snackbar.visible = true;
     },
     stopServer() {
+      if (this.isLoadingOfServer) return;
       this.isLoadingOfServer = true;
-      this.$request({
-        method: 'POST',
-        url: '/stopServer',
-        data: {
-          dbId: this.dbId,
-        },
-      })
-        .then(() => new Promise((resolve) => setTimeout(resolve, 300)))
+      Promise.delayResolve(500)
+        .then(() => {
+          return this.$request({
+            method: 'POST',
+            url: '/stopServer',
+            data: {
+              dbId: this.dbId,
+            },
+          });
+        })
+        .then(() => Promise.delayResolve(500))
         .then(() => {
           this.db.status = 'stopped';
+          this.$store.commit('patchDB', { id: this.db.id, status: 'stopped' });
         })
         .finally(() => {
-          this.showSnackbar({ text: '已停止', color: 'green', icon: 'mdi-stop' });
+          this.showSnackbar({ text: '已停止', icon: 'mdi-stop' });
           this.isLoadingOfServer = false;
         });
     },
     runServer() {
       if (this.isLoadingOfServer) return;
       if (this.collections.length === 0) {
-        this.showSnackbar({ text: '英雄, 你还没有创建集合哦~', color: 'pink' });
+        this.showSnackbar({ text: '英雄, 你还没有创建集合哟~' });
         return;
       }
       if (!this.db.port) {
-        this.showSnackbar({ text: '英雄, 先设置一个端口号哈~ 😁', color: 'pink' });
+        this.showSnackbar({ text: '英雄, 先设置一个端口号哈~ 😁' });
         return;
       }
       if (!this.$refs.portTextFieldRef.validate(true)) {
         return;
       }
       this.isLoadingOfServer = true;
-      this.$request({
-        method: 'POST',
-        url: '/runServer',
-        data: {
-          dbId: this.dbId,
-          port: this.db.port,
-        },
-      })
-        .then(() => new Promise((resolve) => setTimeout(resolve, 300)))
+
+      Promise.delayResolve(500)
+        .then(() => {
+          return this.$request({
+            method: 'POST',
+            url: '/runServer',
+            data: {
+              dbId: this.dbId,
+              port: this.db.port,
+            },
+          });
+        })
+        .then(() => Promise.delayResolve(500))
         .then(() => {
           this.db.status = 'running';
+          this.$store.commit('patchDB', { id: this.db.id, port: this.db.port, status: 'running' });
           this.showSnackbar({ text: '启动成功', color: 'green', icon: 'mdi-fire' });
         })
         .catch((err) => {
-          this.showSnackbar({ text: '英雄! 这个端口被占用了哦! 😮 换个试试~', color: 'pink' });
+          this.showSnackbar({ text: '英雄! 这个端口被占用了哟! 😮 换个试试~' });
         })
         .finally(() => {
           this.isLoadingOfServer = false;
@@ -644,32 +395,43 @@ export default {
     },
     del(collection, i) {
       if (this.isLoading) return;
-      this.curOperateId = collection.id;
-      this.isLoading = true;
-      this.$request({
-        method: 'DELETE',
-        url: `/collections/${collection.id}`,
-      })
-        .then(() => {
-          return new Promise((resolve) => setTimeout(resolve, 300));
-        })
-        .then(() => {
-          this.collections.splice(i, 1);
-        })
-        .finally(() => {
-          this.curOperateId = 0;
-          this.isLoading = false;
-        });
+      this.confirmDialog.show({
+        title: '你确定要删除吗？',
+        text: `删除 "${collection.name}" 集合后数据不可恢复哟！`,
+        cb: () => {
+          this.confirmDialog.visible = false;
+          this.curOperateId = collection.id;
+          this.isLoading = true;
+
+          Promise.delayResolve(300)
+            .then(() => {
+              return this.$request({
+                method: 'DELETE',
+                url: `/collections/${collection.id}`,
+              });
+            })
+            .then(() => {
+              this.collections.splice(i, 1);
+            })
+            .finally(() => {
+              this.curOperateId = 0;
+              this.isLoading = false;
+            });
+        },
+      });
     },
     onSubmitOfCollectionDialog() {
+      if (this.isLoadingOfAddCollection) return;
       if (this.$refs.collectionNameFieldRef.validate(true)) {
         this.isLoadingOfAddCollection = true;
-        this.$request({
-          method: 'POST',
-          url: '/collections',
-          data: { ...this.addCollectionDialog.form.data, dbId: parseInt(this.dbId) },
-        })
-          .then((res) => new Promise((resolve) => setTimeout(() => resolve(res), 300)))
+        Promise.delayResolve(300)
+          .then(() => {
+            return this.$request({
+              method: 'POST',
+              url: '/collections',
+              data: { ...this.addCollectionDialog.form.data, dbId: parseInt(this.dbId) },
+            });
+          })
           .then((res) => {
             this.collections.push(res.data);
             // this.addCollectionDialog.form.data.name = '';

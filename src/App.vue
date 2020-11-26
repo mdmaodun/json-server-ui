@@ -16,16 +16,36 @@
         </p>
         <v-hover v-for="(db, i) in dbs" :key="db.id">
           <template #default="{ hover }">
-            <v-list-item link @click="onDBClick(db)">
+            <v-list-item link @click="onDBClick(db)" :class="{ 'elevation-1': $route.params.dbId == db.id || hover }">
               <v-list-item-content>
                 <v-list-item-title>
-                  <v-icon class="mr-2" :class="hover ? 'text--primary' : 'text--secondary'">mdi-database</v-icon>
-                  <span>{{ db.name }}</span>
+                  <v-icon
+                    large
+                    class="mr-2 text--grey"
+                    :class="{ 'text--primary': $route.params.dbId == db.id || hover }"
+                    >mdi-database</v-icon
+                  >
+                  <span class="mr-2 grey--text" :class="{ 'text--darken-4': $route.params.dbId == db.id || hover }">{{
+                    db.name
+                  }}</span>
                 </v-list-item-title>
+                <!-- <v-progress-linear
+                  v-show="db.status === 'running'"
+                  color="primary"
+                  buffer-value="0"
+                  stream
+                  reverse
+                ></v-progress-linear> -->
+                <v-progress-linear
+                  rounded
+                  indeterminate
+                  v-show="db.status === 'running'"
+                  color="primary"
+                ></v-progress-linear>
               </v-list-item-content>
               <v-btn
                 icon
-                v-show="hover"
+                v-show="db.status !== 'running' && hover"
                 @click.stop="del(db, i)"
                 :loading="isLoadingOfDelDB && curOperationDBId === db.id"
               >
@@ -34,9 +54,14 @@
             </v-list-item>
           </template>
         </v-hover>
-        <v-btn block @click="showCreateDBDialog" height="40" elevation="0" class="mt-6">
+        <v-btn block text @click="showCreateDBDialog" height="40" elevation="0" class="mt-6">
           <v-icon class="mr-2">mdi-database-plus</v-icon>
           <span>创建数据库</span>
+        </v-btn>
+
+        <v-btn block text @click="goAPIGuidePage" height="40" elevation="0" class="mt-2">
+          <v-icon class="mr-2">mdi-book-open-variant</v-icon>
+          <span>API 指南</span>
         </v-btn>
       </v-list>
     </v-navigation-drawer>
@@ -124,28 +149,43 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <confirm-dialog ref="confirmDialog"></confirm-dialog>
   </v-app>
 </template>
 
 <script>
+import { mapState } from 'vuex';
+import ConfirmDialog from './components/ConfirmDialog';
+
 export default {
   name: 'App',
-  data() {
-    return {
-      curOperationDBId: 0,
-      isLoadingOfDelDB: false,
-      isLoadingOfCreateDB: false,
-      isShowDBList: false,
-      dbs: [],
-      createDBDialog: {
-        visible: false,
-        form: {
-          data: {
-            name: '',
-          },
+
+  components: {
+    ConfirmDialog,
+  },
+
+  data: () => ({
+    curOperationDBId: 0,
+    isLoadingOfDelDB: false,
+    isLoadingOfCreateDB: false,
+    isShowDBList: false,
+    // dbs: [],
+    createDBDialog: {
+      visible: false,
+      form: {
+        data: {
+          name: '',
         },
       },
-    };
+    },
+  }),
+
+  computed: {
+    ...mapState(['dbs']),
+    confirmDialog() {
+      return this.$refs.confirmDialog;
+    },
   },
 
   created() {
@@ -153,13 +193,20 @@ export default {
       method: 'GET',
       url: '/dbs',
     }).then((res) => {
-      this.dbs = res.data;
+      // this.dbs = res.data;
+      this.$store.commit('setDBs', res.data);
       this.$nextTick(() => {
         this.isShowDBList = true;
       });
     });
   },
+
   methods: {
+    goAPIGuidePage() {
+      if (this.$route.path !== '/') {
+        this.$router.push('/');
+      }
+    },
     onDBClick(db) {
       if (this.$route.params.dbId != db.id) {
         this.$router.push(`/collections/${db.id}`);
@@ -167,23 +214,37 @@ export default {
     },
     del(db, i) {
       if (this.isLoadingOfDelDB) return;
-      this.curOperationDBId = db.id;
-      this.isLoadingOfDelDB = true;
-      this.$request({
-        method: 'DELETE',
-        url: `/dbs/${db.id}`,
-      })
-        .then(() => Promise.delayResolve(300))
-        .then(() => {
-          this.dbs.splice(i, 1);
-          if (db.id == this.$route.params.dbId) {
-            this.$router.push('/');
-          }
-        })
-        .finally(() => {
-          this.isLoadingOfDelDB = false;
-          this.curOperationDBId = 0;
-        });
+      this.confirmDialog.show({
+        title: '你确定要删除吗？',
+        text: `删除 "${db.name}" 库后数据不可恢复哦！`,
+        cb: () => {
+          this.confirmDialog.loading();
+          this.curOperationDBId = db.id;
+          this.isLoadingOfDelDB = true;
+          this.$request({
+            method: 'DELETE',
+            url: `/dbs/${db.id}`,
+          })
+            .then(() => Promise.delayResolve(300))
+            .then(() => {
+              this.confirmDialog.hide();
+              // this.dbs.splice(i, 1);
+              this.$store.commit('delDB', db.id);
+              if (db.id == this.$route.params.dbId) {
+                if (this.dbs.length === 0) {
+                  this.$router.push('/');
+                } else {
+                  this.$router.push(`/collections/${this.dbs[0].id}`);
+                }
+              }
+            })
+            .finally(() => {
+              this.isLoadingOfDelDB = false;
+              this.curOperationDBId = 0;
+              this.confirmDialog.unloading();
+            });
+        },
+      });
     },
     showCreateDBDialog() {
       // this.isLoadingOfCreateDB = false;
@@ -193,21 +254,29 @@ export default {
       this.createDBDialog.visible = false;
     },
     onSubmitOfCreateDBDialog() {
+      if (this.isLoadingOfCreateDB) return;
       if (this.$refs.dbNameFieldRef.validate(true)) {
         this.isLoadingOfCreateDB = true;
-        this.$request({
-          method: 'POST',
-          url: '/dbs',
-          data: this.createDBDialog.form.data,
-        })
-          .then((res) => Promise.delayResolve(300, res))
+
+        Promise.delayResolve(300)
+          .then(() => {
+            return this.$request({
+              method: 'POST',
+              url: '/dbs',
+              data: this.createDBDialog.form.data,
+            });
+          })
           .then((res) => {
-            this.dbs.push(res.data);
+            // this.dbs.push(res.data);
+            this.$store.commit('addDB', res.data);
             // this.createDBDialog.form.data.name = '';
             this.hideOfCreateDBDialog();
             setTimeout(() => {
               this.$refs.dbNameFieldRef.reset();
             }, 0);
+            // if (this.dbs.length === 1 || !this.$route.path.startsWith('/collections/')) {
+            this.$router.push(`/collections/${res.data.id}`);
+            // }
           })
           .finally(() => {
             this.isLoadingOfCreateDB = false;
@@ -220,7 +289,20 @@ export default {
 
 <style scoped>
 .rotate_360 {
-  transform: rotate(360deg);
   transition: transform 1s;
+  transform: rotate(360deg);
+}
+
+@keyframes rotate_y {
+  0% {
+    transform: rotateY(0);
+  }
+  100% {
+    transform: rotateY(360deg);
+  }
+}
+
+.rotate_y_infinite {
+  animation: rotate_y 2s linear infinite;
 }
 </style>

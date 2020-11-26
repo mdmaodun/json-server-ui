@@ -24,7 +24,7 @@ module.exports = (req, res, next) => {
       path.join(dbDirPath, `db.json`),
       JSON.stringify(
         {
-          db: {
+          _db: {
             version: '1.0.0',
           },
         },
