@@ -272,6 +272,12 @@
               </template>
               <span>格式化</span>
             </v-tooltip> -->
+            <v-checkbox
+              class="mt-5 mr-6"
+              v-model="batchImportDialog.useMock"
+              label="useMock"
+              @click="onClickOfUseMock"
+            ></v-checkbox>
             <v-tooltip bottom>
               <template #activator="{ on, attrs }">
                 <v-btn v-on="on" v-bind="attrs" dark text @click="batchImport" :loading="batchImportDialog.isLoading">
@@ -283,22 +289,29 @@
           </v-toolbar-items>
         </v-toolbar>
 
-        <div class="pa-6">
-          <v-textarea
-            ref="jsonStrOfBatchImportRef"
-            autofocus
-            counter
-            outlined
-            :readonly="batchImportDialog.isLoading"
-            auto-grow
-            @blur="formatJSONStrOfBatchImport"
-            v-model.trim="batchImportDialog.form.data.jsonStr"
-            placeholder='{ "users": [ { "id": 1, "name": "张三", ... }, {...}, ... ], "tasks": [...], ... }'
-            label="请在下方填入 JSON 格式的数据（失去焦点自动格式化，重复的键名，会用后面的覆盖前面的）"
-            :rules="batchImportDialog.form.rules"
-          >
-          </v-textarea>
-        </div>
+        <v-container fluid>
+          <v-row>
+            <v-col>
+              <v-textarea
+                ref="jsonStrOfBatchImportRef"
+                autofocus
+                counter
+                outlined
+                :readonly="batchImportDialog.isLoading"
+                auto-grow
+                @blur="formatJSONStrOfBatchImport"
+                v-model.trim="batchImportDialog.form.data.jsonStr"
+                placeholder='{ "users": [ { "id": 1, "name": "张三", ... }, {...}, ... ], "tasks": [...], ... }'
+                label="请在下方填入 JSON 格式的数据（失去焦点自动格式化，重复的键名，会用后面的覆盖前面的）"
+                :rules="batchImportDialog.form.rules"
+              >
+              </v-textarea>
+            </v-col>
+            <v-col v-show="batchImportDialog.useMock">
+              <v-textarea readonly auto-grow outlined counter :value="jsonStrOfMock"></v-textarea>
+            </v-col>
+          </v-row>
+        </v-container>
       </v-card>
       <overlay :overlay="batchImportDialog.isLoading" text="正在导入中..."></overlay>
     </v-dialog>
@@ -309,6 +322,7 @@
 import { isPlainObject, isArray } from 'lodash';
 import ConfirmDialog from '../components/ConfirmDialog';
 import Overlay from '../components/Overlay';
+import { mock } from 'mockjs';
 
 export default {
   name: 'Collections',
@@ -325,69 +339,83 @@ export default {
     },
   },
 
-  data: () => ({
-    batchImportDialog: {
-      visible: false,
-      isLoading: false,
-      form: {
-        data: {
-          jsonStr: '',
-        },
-        rules: [
-          (v) => (v && v.trim() !== '') || '必填哟~',
-          (v) => {
-            try {
-              const vTrimed = v.trim();
-              // if (/^\[$/.test(v)) return '只能是对象~';
-              if (!/^\{/.test(vTrimed)) return '请以 `{` 开头';
-              if (!/\}$/.test(vTrimed)) return '格式错啦~';
-              const jsonObj = eval('false || ' + vTrimed); // JSON.parse(v);
-              const entries = Object.entries(jsonObj);
-              if (entries.length === 0) return '最少包含一个键值对~';
-              for (const [k, v] of entries) {
-                if (k.trim() === '') return '不能有包含 空字符串 的键名';
-                if (/\s/.test(k)) return `不能有包含 空字符串 的键名 -> \`${k}\``;
-                if (v === null) return '第一层的值不能为 `null`';
-                if (!isPlainObject(v) && !isArray(v)) return '第一层的值只能是 数组 或 对象';
-                if (isArray(v)) {
-                  if (k.length < 2) return `数组类型的数据 -> \`${k}\`, 键名长度必须大于 \`2个\` 字符`;
-                  if (!k.endsWith('s')) return `数组类型的数据 -> \`${k}\`, 键名必须以 小写 \`s\` 结尾`;
-                }
-              }
-              return true;
-            } catch (err) {
-              return '格式错啦~';
-            }
+  data() {
+    return {
+      batchImportDialog: {
+        useMock: false,
+        visible: false,
+        isLoading: false,
+        form: {
+          data: {
+            jsonStr: '',
+            jsonObjOfMock: null,
           },
-        ],
-      },
-    },
-    curOperateId: 0,
-    isLoadingOfServer: false,
-    snackbar: {
-      visible: false,
-      timeout: 2000,
-      text: '',
-      color: '',
-    },
-    isLoading: false,
-    isLoadingOfAddCollection: false,
-    addCollectionDialog: {
-      visible: false,
-      form: {
-        data: {
-          name: '',
-          description: '',
+          rules: [
+            (v) => (v && v.trim() !== '') || '必填哟~',
+            (v) => {
+              try {
+                const vTrimed = v.trim();
+                // if (/^\[$/.test(v)) return '只能是对象~';
+                if (!/^\{/.test(vTrimed)) return '请以 `{` 开头';
+                if (!/\}$/.test(vTrimed)) return '格式错啦~';
+                const jsonObj = eval('false || ' + vTrimed); // JSON.parse(v);
+                const entries = Object.entries(jsonObj);
+                if (entries.length === 0) return '最少包含一个键值对~';
+                for (let [k, v] of entries) {
+                  if (k.trim() === '') return '不能有包含 空字符串 的键名';
+                  if (/\s/.test(k)) return `不能有包含 空字符串 的键名 -> \`${k}\``;
+                  if (v === null) return '第一层的值不能为 `null`';
+                  if (!isPlainObject(v) && !isArray(v)) return '第一层的值只能是 数组 或 对象';
+                  if (isArray(v)) {
+                    if (this.batchImportDialog.useMock) {
+                      const [propName] = k.split('|');
+                      k = propName;
+                    }
+                    if (k.length < 2) return `数组类型的数据 -> \`${k}\`, 键名长度必须大于 \`2个\` 字符`;
+                    if (!k.endsWith('s')) return `数组类型的数据 -> \`${k}\`, 键名必须以 小写 \`s\` 结尾`;
+                  }
+                }
+                return true;
+              } catch (err) {
+                return '格式错啦~';
+              }
+            },
+          ],
         },
       },
-    },
-    db: {},
-    collections: [],
-  }),
+      curOperateId: 0,
+      isLoadingOfServer: false,
+      snackbar: {
+        visible: false,
+        timeout: 2000,
+        text: '',
+        color: '',
+      },
+      isLoading: false,
+      isLoadingOfAddCollection: false,
+      addCollectionDialog: {
+        visible: false,
+        form: {
+          data: {
+            name: '',
+            description: '',
+          },
+        },
+      },
+      db: {},
+      collections: [],
+    };
+  },
 
   computed: {
     confirmDialog() {
       return this.$refs.confirmDialog;
+    },
+    jsonStrOfMock() {
+      if (this.batchImportDialog.form.data.jsonObjOfMock) {
+        return JSON.stringify(this.batchImportDialog.form.data.jsonObjOfMock, null, 2);
+      }
+      return '';
     },
   },
 
@@ -407,6 +435,11 @@ export default {
   },
 
   methods: {
+    onClickOfUseMock() {
+      if (this.batchImportDialog.useMock) {
+        this.formatJSONStrOfBatchImport();
+      }
+    },
     loadDB() {
       if (this.isLoading) return Promise.reject('isloading');
       this.isLoading = true;
@@ -450,7 +483,12 @@ export default {
 
       Promise.delayResolve(500)
         .then(() => {
-          const jsonObj = eval('false || ' + this.batchImportDialog.form.data.jsonStr);
+          let jsonObj = null;
+          if (this.batchImportDialog.useMock) {
+            jsonObj = this.batchImportDialog.form.data.jsonObjOfMock;
+          } else {
+            jsonObj = eval('false || ' + this.batchImportDialog.form.data.jsonStr);
+          }
           return this.$request({
             method: 'POST',
             url: '/batchImport',
@@ -460,13 +498,14 @@ export default {
             },
           });
         })
+        .then(() => Promise.delayResolve(1500))
         .then(() => {
           return this.loadCollections();
         })
-        .then(() => Promise.delayResolve(500))
         .then(() => {
           this.hideBatchImportDialog();
           this.showSnackbar({ text: '导入成功', color: 'green', icon: 'mdi-check-bold' });
+          this.batchImportDialog.form.data.jsonObjOfMock = null;
           this.$refs.jsonStrOfBatchImportRef.reset();
         })
         .catch((err) => {
@@ -478,10 +517,13 @@ export default {
         });
     },
     formatJSONStrOfBatchImport() {
+      if (!this.$refs.jsonStrOfBatchImportRef.validate(true)) return;
       try {
-        if (!this.$refs.jsonStrOfBatchImportRef.validate(true)) return;
         const jsonObj = eval('false || ' + this.batchImportDialog.form.data.jsonStr); // JSON.parse(this.batchImportDialog.form.data.jsonStr);
         this.batchImportDialog.form.data.jsonStr = JSON.stringify(jsonObj, null, 2);
+        if (this.batchImportDialog.useMock) {
+          this.batchImportDialog.form.data.jsonObjOfMock = mock(jsonObj);
+        }
       } catch (err) {}
     },
     onChangeOfSnackbar() {
@@ -511,7 +553,7 @@ export default {
             },
           });
         })
-        .then(() => Promise.delayResolve(1000))
+        .then(() => Promise.delayResolve(1500))
         .then(() => {
           this.db.status = 'stopped';
           this.$store.commit('patchDB', { id: this.db.id, status: 'stopped' });
@@ -547,7 +589,7 @@ export default {
             },
           });
         })
-        .then(() => Promise.delayResolve(1000))
+        .then(() => Promise.delayResolve(1500))
         .then(() => {
           this.db.status = 'running';
           this.$store.commit('patchDB', { id: this.db.id, port: this.db.port, status: 'running' });
