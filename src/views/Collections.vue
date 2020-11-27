@@ -272,12 +272,6 @@
               </template>
               <span>格式化</span>
             </v-tooltip> -->
-            <v-checkbox
-              class="mt-5 mr-6"
-              v-model="batchImportDialog.useMock"
-              label="useMock"
-              @click="onClickOfUseMock"
-            ></v-checkbox>
             <v-tooltip bottom>
               <template #activator="{ on, attrs }">
                 <v-btn v-on="on" v-bind="attrs" dark text @click="batchImport" :loading="batchImportDialog.isLoading">
@@ -285,6 +279,29 @@
                 </v-btn>
               </template>
               <span>导入</span>
+            </v-tooltip>
+            <v-divider vertical inset class="mx-6"></v-divider>
+            <v-tooltip bottom>
+              <template #activator="{ on, attrs }">
+                <div v-on="on" v-bind="attrs">
+                  <v-checkbox
+                    class="mt-5 mr-6"
+                    v-model="batchImportDialog.useMock"
+                    label="useMock"
+                    @click="onClickOfUseMock"
+                  ></v-checkbox>
+                </div>
+              </template>
+              <span>使用 Mock.js 语法</span>
+            </v-tooltip>
+            <v-tooltip bottom>
+              <template #activator="{ on, attrs }">
+                <v-btn v-on="on" v-bind="attrs" href="http://mockjs.com" target="_blank" text>
+                  <span class="mr-2">Mock.js</span>
+                  <v-icon>mdi-open-in-new</v-icon>
+                </v-btn>
+              </template>
+              <span>Mock.js 官网</span>
             </v-tooltip>
           </v-toolbar-items>
         </v-toolbar>
@@ -302,13 +319,17 @@
                 @blur="formatJSONStrOfBatchImport"
                 v-model.trim="batchImportDialog.form.data.jsonStr"
                 placeholder='{ "users": [ { "id": 1, "name": "张三", ... }, {...}, ... ], "tasks": [...], ... }'
-                label="请在下方填入 JSON 格式的数据（失去焦点自动格式化，重复的键名，会用后面的覆盖前面的）"
+                :label="
+                  batchImportDialog.useMock
+                    ? '请在下方填入 Mock.js 模板语法（失去焦点自动格式化，并生成预览数据，重复的键名，会用后面的覆盖前面的）'
+                    : '请在下方填入 JSON 格式的数据（失去焦点自动格式化，重复的键名，会用后面的覆盖前面的）'
+                "
                 :rules="batchImportDialog.form.rules"
               >
               </v-textarea>
             </v-col>
             <v-col v-show="batchImportDialog.useMock">
-              <v-textarea readonly auto-grow outlined counter :value="jsonStrOfMock"></v-textarea>
+              <v-textarea readonly auto-grow outlined counter :value="jsonStrOfMock" label="Mock 数据预览"></v-textarea>
             </v-col>
           </v-row>
         </v-container>
