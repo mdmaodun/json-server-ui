@@ -1,7 +1,10 @@
 const lowdb = require('lowdb');
 const FileSync = require('lowdb/adapters/FileSync');
 
-module.exports = (jsonFilePath) => lowdb(new FileSync(jsonFilePath));
+module.exports = (jsonFilePath) => {
+  const db = lowdb(new FileSync(jsonFilePath));
+  return db;
+};
 
 // const path = require('path');
 // const lowdb = require('lowdb');

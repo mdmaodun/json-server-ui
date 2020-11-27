@@ -22,6 +22,21 @@
             <span>添加集合</span>
           </v-tooltip>
 
+          <v-tooltip bottom>
+            <template #activator="{ on, attrs, value }">
+              <v-btn
+                icon
+                v-bind="attrs"
+                v-on="on"
+                @click="showBatchImportDialog"
+                :class="value ? 'text--primary' : 'text-secondary'"
+              >
+                <v-icon>mdi-database-import</v-icon>
+              </v-btn>
+            </template>
+            <span>增量导入集合</span>
+          </v-tooltip>
+
           <v-divider vertical inset class="mx-4"></v-divider>
 
           <v-icon :color="db.status === 'running' ? 'primary' : ''">mdi-server</v-icon>
@@ -197,7 +212,7 @@
               (v) => (v && /^[a-zA-Z_]/.test(v.trim())) || '英雄，需要用 字母 或 下划线 开头哟~',
               (v) => (v && v.trim().length >= 2) || '英雄，最少 两个 字符哟~',
               (v) => (v && /^[a-zA-Z_]\w+$/.test(v.trim())) || '英雄，只能由字母、数字、下划线组成哟~',
-              (v) => (v && /s$/.test(v.trim()) || '英雄，需要以小写 `s` 结尾哟~' ),
+              (v) => (v && /s$/.test(v.trim())) || '英雄，需要以小写 `s` 结尾哟~',
               (v) => (v && !collections.some((c) => c.name === v.trim())) || '英雄，这个集合已经存在了哟~',
             ]"
             @keyup.enter="onSubmitOfCollectionDialog"
@@ -238,16 +253,69 @@
     </v-snackbar>
 
     <confirm-dialog ref="confirmDialog"></confirm-dialog>
+
+    <v-dialog v-model="batchImportDialog.visible" fullscreen hide-overlay transition="dialog-bottom-transition">
+      <v-card>
+        <v-toolbar dark color="primary">
+          <v-btn icon dark @click="hideBatchImportDialog">
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+          <v-toolbar-title>增量导入</v-toolbar-title>
+          <v-subheader>已有的保留，重复的覆盖</v-subheader>
+          <v-spacer></v-spacer>
+          <v-toolbar-items>
+            <!-- <v-tooltip bottom>
+              <template #activator="{ on, attrs }">
+                <v-btn v-on="on" v-bind="attrs" dark text @click="formatJSONStrOfBatchImport">
+                  <v-icon>mdi-code-json</v-icon>
+                </v-btn>
+              </template>
+              <span>格式化</span>
+            </v-tooltip> -->
+            <v-tooltip bottom>
+              <template #activator="{ on, attrs }">
+                <v-btn v-on="on" v-bind="attrs" dark text @click="batchImport" :loading="batchImportDialog.isLoading">
+                  <v-icon>mdi-database-import</v-icon>
+                </v-btn>
+              </template>
+              <span>导入</span>
+            </v-tooltip>
+          </v-toolbar-items>
+        </v-toolbar>
+
+        <div class="pa-6">
+          <v-textarea
+            ref="jsonStrOfBatchImportRef"
+            autofocus
+            counter
+            outlined
+            :readonly="batchImportDialog.isLoading"
+            auto-grow
+            @blur="formatJSONStrOfBatchImport"
+            v-model.trim="batchImportDialog.form.data.jsonStr"
+            placeholder='{ "users": [ { "id": 1, "name": "张三", ... }, {...}, ... ], "tasks": [...], ... }'
+            label="请在下方填入 JSON 格式的数据（失去焦点自动格式化，重复的键名，会用后面的覆盖前面的）"
+            :rules="batchImportDialog.form.rules"
+          >
+          </v-textarea>
+        </div>
+      </v-card>
+      <overlay :overlay="batchImportDialog.isLoading" text="正在导入中..."></overlay>
+    </v-dialog>
   </div>
 </template>
 
 <script>
+import { isPlainObject, isArray } from 'lodash';
 import ConfirmDialog from '../components/ConfirmDialog';
+import Overlay from '../components/Overlay';
+
 export default {
   name: 'Collections',
 
   components: {
     ConfirmDialog,
+    Overlay,
   },
 
   props: {
@@ -258,6 +326,42 @@ export default {
   },
 
   data: () => ({
+    batchImportDialog: {
+      visible: false,
+      isLoading: false,
+      form: {
+        data: {
+          jsonStr: '',
+        },
+        rules: [
+          (v) => (v && v.trim() !== '') || '必填哟~',
+          (v) => {
+            try {
+              const vTrimed = v.trim();
+              // if (/^\[$/.test(v)) return '只能是对象~';
+              if (!/^\{/.test(vTrimed)) return '请以 `{` 开头';
+              if (!/\}$/.test(vTrimed)) return '格式错啦~';
+              const jsonObj = eval('false || ' + vTrimed); // JSON.parse(v);
+              const entries = Object.entries(jsonObj);
+              if (entries.length === 0) return '最少包含一个键值对~';
+              for (const [k, v] of entries) {
+                if (k.trim() === '') return '不能有包含 空字符串 的键名';
+                if (/\s/.test(k)) return `不能有包含 空字符串 的键名 -> \`${k}\``;
+                if (v === null) return '第一层的值不能为 `null`';
+                if (!isPlainObject(v) && !isArray(v)) return '第一层的值只能是 数组 或 对象';
+                if (isArray(v)) {
+                  if (k.length < 2) return `数组类型的数据 -> \`${k}\`, 键名长度必须大于 \`2个\` 字符`;
+                  if (!k.endsWith('s')) return `数组类型的数据 -> \`${k}\`, 键名必须以 小写 \`s\` 结尾`;
+                }
+              }
+              return true;
+            } catch (err) {
+              return '格式错啦~';
+            }
+          },
+        ],
+      },
+    },
     curOperateId: 0,
     isLoadingOfServer: false,
     snackbar: {
@@ -266,7 +370,7 @@ export default {
       text: '',
       color: '',
     },
-    isLoading: true,
+    isLoading: false,
     isLoadingOfAddCollection: false,
     addCollectionDialog: {
       visible: false,
@@ -291,23 +395,9 @@ export default {
     dbId: {
       immediate: true,
       handler() {
-        this.isLoading = true;
-        this.$request({
-          method: 'GET',
-          url: `/dbs/${this.dbId}`,
-        })
-          .then((res) => {
-            this.db = res.data;
-            return this.$request({
-              method: 'GET',
-              url: `/collections?dbId=${this.dbId}`,
-            });
-          })
-          .then((res) => {
-            this.collections = res.data;
-          })
+        this.loadDB()
           .then(() => {
-            this.isLoading = false;
+            return this.loadCollections();
           })
           .catch(() => {
             this.$router.push('/');
@@ -317,6 +407,83 @@ export default {
   },
 
   methods: {
+    loadDB() {
+      if (this.isLoading) return Promise.reject('isloading');
+      this.isLoading = true;
+      return this.$request({
+        method: 'GET',
+        url: `/dbs/${this.dbId}`,
+      })
+        .then((res) => {
+          this.db = res.data;
+        })
+        .catch((err) => {
+          throw err;
+        })
+        .finally(() => {
+          this.isLoading = false;
+        });
+    },
+    loadCollections() {
+      if (this.isLoading) return Promise.reject('isloading');
+      this.isLoading = true;
+      return this.$request({
+        method: 'GET',
+        url: `/collections?dbId=${this.dbId}`,
+      })
+        .then((res) => {
+          this.collections = res.data;
+        })
+        .catch((err) => {
+          throw err;
+        })
+        .finally(() => {
+          this.isLoading = false;
+        });
+    },
+    batchImport() {
+      if (this.batchImportDialog.isLoading) return;
+
+      if (!this.$refs.jsonStrOfBatchImportRef.validate(true)) return;
+
+      this.batchImportDialog.isLoading = true;
+
+      Promise.delayResolve(500)
+        .then(() => {
+          const jsonObj = eval('false || ' + this.batchImportDialog.form.data.jsonStr);
+          return this.$request({
+            method: 'POST',
+            url: '/batchImport',
+            data: {
+              dbId: this.dbId,
+              jsonObj, // : JSON.parse(this.batchImportDialog.form.data.jsonStr),
+            },
+          });
+        })
+        .then(() => {
+          return this.loadCollections();
+        })
+        .then(() => Promise.delayResolve(500))
+        .then(() => {
+          this.hideBatchImportDialog();
+          this.showSnackbar({ text: '导入成功', color: 'green', icon: 'mdi-check-bold' });
+          this.$refs.jsonStrOfBatchImportRef.reset();
+        })
+        .catch((err) => {
+          this.showSnackbar({ text: `系统异常，请稍后重试`, color: 'pink', icon: 'mdi-emoticon-cry-outline' });
+          throw err;
+        })
+        .finally(() => {
+          this.batchImportDialog.isLoading = false;
+        });
+    },
+    formatJSONStrOfBatchImport() {
+      try {
+        if (!this.$refs.jsonStrOfBatchImportRef.validate(true)) return;
+        const jsonObj = eval('false || ' + this.batchImportDialog.form.data.jsonStr); // JSON.parse(this.batchImportDialog.form.data.jsonStr);
+        this.batchImportDialog.form.data.jsonStr = JSON.stringify(jsonObj, null, 2);
+      } catch (err) {}
+    },
     onChangeOfSnackbar() {
       if (!this.snackbar.visible) {
         setTimeout(() => {
@@ -344,7 +511,7 @@ export default {
             },
           });
         })
-        .then(() => Promise.delayResolve(500))
+        .then(() => Promise.delayResolve(1000))
         .then(() => {
           this.db.status = 'stopped';
           this.$store.commit('patchDB', { id: this.db.id, status: 'stopped' });
@@ -380,7 +547,7 @@ export default {
             },
           });
         })
-        .then(() => Promise.delayResolve(500))
+        .then(() => Promise.delayResolve(1000))
         .then(() => {
           this.db.status = 'running';
           this.$store.commit('patchDB', { id: this.db.id, port: this.db.port, status: 'running' });
@@ -445,6 +612,12 @@ export default {
             this.isLoadingOfAddCollection = false;
           });
       }
+    },
+    showBatchImportDialog() {
+      this.batchImportDialog.visible = true;
+    },
+    hideBatchImportDialog() {
+      this.batchImportDialog.visible = false;
     },
     showAddCollectionDialog() {
       this.addCollectionDialog.visible = true;

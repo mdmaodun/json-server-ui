@@ -54,12 +54,12 @@
             </v-list-item>
           </template>
         </v-hover>
-        <v-btn block text @click="showCreateDBDialog" height="40" elevation="0" class="mt-6">
+        <v-btn block text @click="showCreateDBDialog" height="40" elevation="0" class="mt-6 justify-start">
           <v-icon class="mr-2">mdi-database-plus</v-icon>
           <span>创建数据库</span>
         </v-btn>
 
-        <v-btn block text @click="goAPIGuidePage" height="40" elevation="0" class="mt-2">
+        <v-btn block text @click="goAPIGuidePage" height="40" elevation="0" class="mt-2 justify-start">
           <v-icon class="mr-2">mdi-book-open-variant</v-icon>
           <span>API 指南</span>
         </v-btn>
@@ -151,18 +151,20 @@
     </v-dialog>
 
     <confirm-dialog ref="confirmDialog"></confirm-dialog>
+    <overlay :overlay="overlay"></overlay>
   </v-app>
 </template>
 
 <script>
 import { mapState } from 'vuex';
 import ConfirmDialog from './components/ConfirmDialog';
-
+import Overlay from './components/Overlay';
 export default {
   name: 'App',
 
   components: {
     ConfirmDialog,
+    Overlay,
   },
 
   data: () => ({
@@ -182,7 +184,7 @@ export default {
   }),
 
   computed: {
-    ...mapState(['dbs']),
+    ...mapState(['dbs', 'overlay']),
     confirmDialog() {
       return this.$refs.confirmDialog;
     },

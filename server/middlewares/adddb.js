@@ -20,18 +20,7 @@ module.exports = (req, res, next) => {
       fs.copyFileSync(path.join(__dirname, './upload.js'), uploadMiddlewareFilePathDest);
     }
     fs.writeFileSync(path.join(dbDirPath, 'routes-map.json'), '{}');
-    fs.writeFileSync(
-      path.join(dbDirPath, `db.json`),
-      JSON.stringify(
-        {
-          _db: {
-            version: '1.0.0',
-          },
-        },
-        null,
-        2
-      )
-    );
+    fs.writeFileSync(path.join(dbDirPath, `db.json`), '{}');
   }
   next();
 };

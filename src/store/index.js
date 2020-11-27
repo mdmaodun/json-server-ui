@@ -6,8 +6,15 @@ Vue.use(Vuex);
 const store = new Vuex.Store({
   state: {
     dbs: [],
+    overlay: false,
   },
   mutations: {
+    showOverlay(state) {
+      state.overlay = true;
+    },
+    hideOverlay(state) {
+      state.overlay = false;
+    },
     setDBs(state, dbs) {
       state.dbs = dbs;
     },

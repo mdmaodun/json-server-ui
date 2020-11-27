@@ -20,4 +20,17 @@ Content-Type: application/json
 
 ###
 #
-DELETE {{baseurl}}/collections/2
+DELETE {{baseurl}}/collections/3
+
+###
+# 导入集合
+POST {{baseurl}}/batchImport
+Content-Type: application/json
+
+{
+  "dbId": 2,
+  "jsonObj": {
+    "users1": [{"id": 1, "name": "zs"}],
+    "tasks2": []
+  }
+}
