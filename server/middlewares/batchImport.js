@@ -20,20 +20,26 @@ module.exports = (req, res, next) => {
 
     let nextId = getNextId(collections.value());
 
-    collections
-      .remove((v) => {
-        return (
-          v.dbId === dbId &&
-          Object.keys(jsonObj)
-            .map((v) => v.trim())
-            .includes(v.name)
-        );
-      })
-      .write();
+    // collections
+    //   .remove((v) => {
+    //     return (
+    //       v.dbId === dbId &&
+    //       Object.keys(jsonObj)
+    //         .map((v) => v.trim())
+    //         .includes(v.name)
+    //     );
+    //   })
+    //   .write();
+
+    const collectionsOfTheDB = collections.filter((v) => v.dbId === dbId).value();
+
+    const jsonObjEntriesOfNotInTheDBCollecitons = Object.entries(jsonObj).filter(([k, v]) =>
+      collectionsOfTheDB.every((c) => c.name !== k.trim())
+    );
 
     const now = Date.now();
 
-    for (const [k, v] of Object.entries(jsonObj)) {
+    for (const [k, v] of jsonObjEntriesOfNotInTheDBCollecitons) {
       if (db._.isArray(v)) {
         collections
           .push({
@@ -49,7 +55,30 @@ module.exports = (req, res, next) => {
     }
 
     const db2 = getdb(join(dbsRootDirPath, dbName, 'db.json'));
-    db2.setState(db2._.assign(db2.getState(), jsonObj)).write();
+    const state = db2.getState();
+    const keys = Object.keys(state);
+
+    for (const [k, v] of Object.entries(jsonObj)) {
+      if (keys.includes(k)) {
+        if (db._.isArray(v)) {
+          if (db._.isArray(state[k])) {
+            state[k].push(...v);
+          } else {
+            state[k] = v;
+          }
+        } else {
+          if (db._.isPlainObject(state[k])) {
+            state[k] = { ...state[k], ...v };
+          } else {
+            collections.remove((v) => v.dbId === dbId && v.name === k.trim()).write();
+            state[k] = v;
+          }
+        }
+      } else {
+        state[k] = v;
+      }
+    }
+    db2.setState(state).write();
 
     res.send('ok.');
     return;

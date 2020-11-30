@@ -261,7 +261,7 @@
             <v-icon>mdi-close</v-icon>
           </v-btn>
           <v-toolbar-title>增量导入</v-toolbar-title>
-          <v-subheader>已有的保留，重复的覆盖</v-subheader>
+          <v-subheader>已有的保留</v-subheader>
           <v-spacer></v-spacer>
           <v-toolbar-items>
             <!-- <v-tooltip bottom>
@@ -321,8 +321,8 @@
                 placeholder='{ "users": [ { "id": 1, "name": "张三", ... }, {...}, ... ], "tasks": [...], ... }'
                 :label="
                   batchImportDialog.useMock
-                    ? '请在下方填入 Mock.js 模板语法（失去焦点自动格式化，并生成预览数据，重复的键名，会用后面的覆盖前面的）'
-                    : '请在下方填入 JSON 格式的数据（失去焦点自动格式化，重复的键名，会用后面的覆盖前面的）'
+                    ? '请在下方填入 Mock.js 模板语法（失去焦点自动格式化，并生成预览数据）'
+                    : '请在下方填入 JSON 格式的数据（失去焦点自动格式化）'
                 "
                 :rules="batchImportDialog.form.rules"
               >
