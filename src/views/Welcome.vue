@@ -1,7 +1,13 @@
 <template>
   <div class="welcome">
     <v-alert text color="info" icon="mdi-fire" border="left">
-      <h3>嘿，英雄~ 😻</h3>
+      <h3 class="d-inline">嘿，英雄~ 😻</h3>
+      <p class="font-italic ml-4 d-inline">
+        调试 API 可以使用
+        <span class="font-weight-bold">Postman</span> 或者
+        <span class="font-weight-bold">REST Client</span>
+        哦~
+      </p>
     </v-alert>
     <v-card>
       <v-toolbar>

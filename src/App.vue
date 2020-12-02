@@ -59,7 +59,7 @@
           <span>创建数据库</span>
         </v-btn>
 
-        <v-btn block text @click="goAPIGuidePage" height="40" elevation="0" class="mt-2 justify-start">
+        <v-btn block text @click="goAPIGuidePage" height="40" elevation="0" class="mt-2 ml-1 justify-start">
           <v-icon class="mr-2">mdi-book-open-variant</v-icon>
           <span>API 指南</span>
         </v-btn>

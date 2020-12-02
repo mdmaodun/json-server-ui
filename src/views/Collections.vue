@@ -127,6 +127,13 @@
         <p class="text--secondary" v-show="!isLoading && collections.length === 0">
           暂无集合
         </p>
+        <p class="font-italic pt-4 pl-1" v-show="db.status === 'running'">
+          <span class="font-weight-bold black--text">提示：</span>
+          更多 API 调试可以使用
+          <span class="font-weight-bold">Postman</span> 或者
+          <span class="font-weight-bold">REST Client</span>
+          哦~
+        </p>
         <v-row>
           <v-col v-for="(v, i) in collections" :key="v.id" cols="3" class="float-left">
             <v-hover>
