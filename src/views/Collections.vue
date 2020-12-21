@@ -334,6 +334,12 @@
                 :rules="batchImportDialog.form.rules"
               >
               </v-textarea>
+              <pre style="background-color: #f6f8fa;" v-show="batchImportDialog.useMock">
+
+    已扩展 Mock.Random 占位符：
+
+    1. @date.now()，获取当前毫秒数
+              </pre>
             </v-col>
             <v-col v-show="batchImportDialog.useMock">
               <v-textarea readonly auto-grow outlined counter :value="jsonStrOfMock" label="Mock 数据预览"></v-textarea>
@@ -350,7 +356,11 @@
 import { isPlainObject, isArray } from 'lodash';
 import ConfirmDialog from '../components/ConfirmDialog';
 import Overlay from '../components/Overlay';
-import { mock } from 'mockjs';
+import { mock, Random } from 'mockjs';
+
+Random.extend({
+  'date.now': () => Date.now(),
+});
 
 export default {
   name: 'Collections',
