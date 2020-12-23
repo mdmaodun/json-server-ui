@@ -338,7 +338,9 @@
 
     已扩展 Mock.Random 占位符：
 
-    1. @date.now()，获取当前毫秒数
+    1. @phone()，手机号码
+    2. @tel()，固定电话号码（国内）
+    3. @date.now()，当前毫秒数
               </pre>
             </v-col>
             <v-col v-show="batchImportDialog.useMock">
@@ -360,6 +362,8 @@ import { mock, Random } from 'mockjs';
 
 Random.extend({
   'date.now': () => Date.now(),
+  phone: () => mock(/^1[35678]\d{9}$/),
+  tel: () => mock(/^0\d{2,3}-[1-9]\d{6,7}$/),
 });
 
 export default {
@@ -558,7 +562,32 @@ export default {
       if (!this.$refs.jsonStrOfBatchImportRef.validate(true)) return;
       try {
         const jsonObj = eval('false || ' + this.batchImportDialog.form.data.jsonStr); // JSON.parse(this.batchImportDialog.form.data.jsonStr);
-        this.batchImportDialog.form.data.jsonStr = JSON.stringify(jsonObj, null, 2);
+
+        this.batchImportDialog.form.data.jsonStr = JSON.stringify(
+          jsonObj,
+          (k, v) => {
+            if (k) {
+              if (v instanceof Function) {
+                return `__remove_double_quote_mark__${v
+                  .toString()
+                  .replace(/\n/g, '__/n__')
+                  .replace(/\t/g, '__/t__')}__remove_double_quote_mark__`;
+              }
+              if (v instanceof RegExp) {
+                return `__remove_double_quote_mark__${v
+                  .toString()
+                  .replace(/\\/g, '__/__')}__remove_double_quote_mark__`;
+              }
+            }
+            return v;
+          },
+          2
+        )
+          .replace(/\"?__remove_double_quote_mark__\"?/g, '')
+          .replace(/__\/__/g, '\\')
+          .replace(/__\/n__/g, '\n')
+          .replace(/__\/t__/g, '\t');
+
         if (this.batchImportDialog.useMock) {
           this.batchImportDialog.form.data.jsonObjOfMock = mock(jsonObj);
         }
