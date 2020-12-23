@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-navigation-drawer app>
+    <v-navigation-drawer app permanent>
       <!-- <v-list-item>
         <v-list-item-content>
           <v-list-item-title class="title">
@@ -85,7 +85,9 @@
           <v-toolbar-title>JSON-SERVER-UI</v-toolbar-title>
         </div>
       </v-hover>
-      <v-subheader>这是一个次奥🐓简单的 JSON-SERVER 图形化管理界面！🙂</v-subheader>
+      <v-subheader class="text-truncate">
+        这是一个次奥🐓简单的 JSON-SERVER 图形化管理界面！🙂
+      </v-subheader>
 
       <v-spacer></v-spacer>
 

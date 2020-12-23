@@ -165,12 +165,12 @@
                         text
                         block
                         color="teal"
-                        class="text-lowercase justify-start"
+                        class="text-lowercase justify-start text-truncate"
                         :href="`http://localhost:${db.port}/${v.name}`"
                         target="_blank"
                       >
                         <v-icon small class="mr-1">mdi-code-json</v-icon>
-                        <span class="body-2">http://localhost:{{ db.port }}/{{ v.name }}</span>
+                        <span class="body-2">/{{ v.name }}</span>
                       </v-btn>
                     </template>
                     <span>获取列表数据</span>
@@ -184,12 +184,12 @@
                         text
                         block
                         color="teal"
-                        class="text-lowercase justify-start"
+                        class="text-lowercase justify-start text-truncate"
                         :href="`http://localhost:${db.port}/${v.name}/1`"
                         target="_blank"
                       >
                         <v-icon small class="mr-1">mdi-code-json</v-icon>
-                        <span class="body-2">http://localhost:{{ db.port }}/{{ v.name }}/1</span>
+                        <span class="body-2">/{{ v.name }}/1</span>
                       </v-btn>
                     </template>
                     <span>获取 id 为 1 的数据</span>
@@ -343,8 +343,8 @@
     3. @date.now()，当前毫秒数
               </pre>
             </v-col>
-            <v-col v-show="batchImportDialog.useMock">
-              <v-textarea readonly auto-grow outlined counter :value="jsonStrOfMock" label="Mock 数据预览"></v-textarea>
+            <v-col v-show="batchImportDialog.useMock" style="max-height: calc(100vh - 90px); overflow-y: auto;">
+              <v-textarea auto-grow no-resize readonly outlined counter :value="jsonStrOfMock" label="Mock 数据预览"></v-textarea>
             </v-col>
           </v-row>
         </v-container>
