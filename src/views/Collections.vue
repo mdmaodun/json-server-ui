@@ -129,7 +129,8 @@
         </p>
         <p class="font-italic pt-4 pl-1" v-show="db.status === 'running'">
           <span class="font-weight-bold black--text">提示：</span>
-          更多 API 调试可以使用
+          <a href="#/" class="text-decoration-none">更多 API</a>
+          调试可以使用
           <span class="font-weight-bold">Postman</span> 或者
           <span class="font-weight-bold">REST Client</span>
           哦~
@@ -193,6 +194,44 @@
                       </v-btn>
                     </template>
                     <span>获取 id 为 1 的数据</span>
+                  </v-tooltip>
+                  <v-tooltip bottom>
+                    <template #activator="{ on, attrs }">
+                      <v-btn
+                        v-on="on"
+                        v-bind="attrs"
+                        v-show="db.status === 'running'"
+                        text
+                        block
+                        color="teal"
+                        class="text-lowercase justify-start text-truncate"
+                        :href="`http://localhost:${db.port}/${v.name}?_page=1&_limit=20`"
+                        target="_blank"
+                      >
+                        <v-icon small class="mr-1">mdi-code-json</v-icon>
+                        <span class="body-2">/{{ v.name }}?_page=1&_limit=20</span>
+                      </v-btn>
+                    </template>
+                    <span>分页查询</span>
+                  </v-tooltip>
+                  <v-tooltip bottom>
+                    <template #activator="{ on, attrs }">
+                      <v-btn
+                        v-on="on"
+                        v-bind="attrs"
+                        v-show="db.status === 'running'"
+                        text
+                        block
+                        color="teal"
+                        class="text-lowercase justify-start text-truncate"
+                        :href="`http://localhost:${db.port}/${v.name}?_sort=id&_order=desc`"
+                        target="_blank"
+                      >
+                        <v-icon small class="mr-1">mdi-code-json</v-icon>
+                        <span class="body-2">/{{ v.name }}?_sort=id&_order=desc</span>
+                      </v-btn>
+                    </template>
+                    <span>排序</span>
                   </v-tooltip>
                 </v-card>
               </template>
@@ -344,7 +383,15 @@
               </pre>
             </v-col>
             <v-col v-show="batchImportDialog.useMock" style="max-height: calc(100vh - 90px); overflow-y: auto;">
-              <v-textarea auto-grow no-resize readonly outlined counter :value="jsonStrOfMock" label="Mock 数据预览"></v-textarea>
+              <v-textarea
+                auto-grow
+                no-resize
+                readonly
+                outlined
+                counter
+                :value="jsonStrOfMock"
+                label="Mock 数据预览"
+              ></v-textarea>
             </v-col>
           </v-row>
         </v-container>
